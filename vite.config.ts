@@ -15,6 +15,11 @@ export default defineConfig((config) => {
     },
     build: {
       target: 'esnext',
+      minify: 'esbuild',
+      chunkSizeWarningLimit: 1000,
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'framer-motion'],
     },
     plugins: [
       nodePolyfills({

@@ -22,7 +22,7 @@ export const DialogButton = memo(({ type, children, onClick, disabled }: DialogB
   return (
     <button
       className={classNames(
-        'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors',
+        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors',
         type === 'primary'
           ? 'bg-purple-500 text-white hover:bg-purple-600 dark:bg-purple-500 dark:hover:bg-purple-600'
           : type === 'secondary'
@@ -40,7 +40,7 @@ export const DialogButton = memo(({ type, children, onClick, disabled }: DialogB
 export const DialogTitle = memo(({ className, children, ...props }: RadixDialog.DialogTitleProps) => {
   return (
     <RadixDialog.Title
-      className={classNames('text-lg font-medium text-bolt-elements-textPrimary flex items-center gap-2', className)}
+      className={classNames('text-md font-medium text-bolt-elements-textPrimary flex items-center gap-1.5', className)}
       {...props}
     >
       {children}
@@ -116,7 +116,7 @@ export const Dialog = memo(({ children, className, showCloseButton = true, onClo
       <RadixDialog.Content asChild>
         <motion.div
           className={classNames(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-950 rounded-lg shadow-xl border border-bolt-elements-borderColor z-[9999] w-[520px] focus:outline-none',
+            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-950 rounded-lg shadow-xl border border-bolt-elements-borderColor z-[9999] w-[90%] max-w-[400px] focus:outline-none',
             className,
           )}
           initial="closed"
@@ -130,7 +130,7 @@ export const Dialog = memo(({ children, className, showCloseButton = true, onClo
               <RadixDialog.Close asChild onClick={onClose}>
                 <IconButton
                   icon="i-ph:x"
-                  className="absolute top-3 right-3 text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary"
+                  className="absolute top-2 right-2 text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary"
                 />
               </RadixDialog.Close>
             )}
