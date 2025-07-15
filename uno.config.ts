@@ -230,6 +230,10 @@ export default defineConfig({
     },
   },
   transformers: [transformerDirectives()],
+  rules: [
+    // Custom text sizes for mobile optimization
+    ['text-2xs', { 'font-size': '0.625rem', 'line-height': '0.75rem' }],
+  ],
   presets: [
     presetUno({
       dark: {
