@@ -6,7 +6,8 @@ import { useStore } from '@nanostores/react';
 import type { Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useAnimate } from 'framer-motion';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+
+import React, { useEffect, useCallback } from 'react';
 import { cssTransition, toast, ToastContainer } from 'react-toastify';
 import { useMessageParser, usePromptEnhancer, useShortcuts } from '~/lib/hooks';
 import { description, useChatHistory } from '~/lib/persistence';
@@ -27,9 +28,12 @@ import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
-import { agentModelsStore, getAgentByModel, isModelInAgentMode } from '~/lib/stores/agent-mode';
-import { advancedAIAgent, type AgentResponse } from '~/lib/agents/advanced-ai-agent';
-import { AgentThinkingDisplay } from '~/components/agent/AgentThinkingDisplay';
+
+/*
+ * import isModelInAgentMode from '~/lib/stores/agent-mode';
+ * import advancedAIAgent from '~/lib/agents/advanced-ai-agent';
+ * import AgentThinkingDisplay from '~/components/agent/AgentThinkingDisplay';
+ */
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -152,7 +156,7 @@ export const ChatImpl = memo(
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
 
     // Get agent information for current model
-    const agentModels = useStore(agentModelsStore);
+    const _agentModels = useStore(agentModelsStore);
     const currentAgent = model && provider ? getAgentByModel(model, provider.name) : null;
     const agentSystemPrompt = currentAgent?.systemPrompt;
 
@@ -210,7 +214,7 @@ export const ChatImpl = memo(
             model,
             provider: provider.name,
             usage,
-            messageLength: message.content.length,
+            messageLength: message._content.length,
           });
         }
 

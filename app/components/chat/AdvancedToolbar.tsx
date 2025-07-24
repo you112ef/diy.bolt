@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { classNames } from '~/utils/classNames';
-import { ADVANCED_TOOLS, getToolsByCategory, type AdvancedTool } from '~/lib/tools/advanced-tools';
+
+// import ADVANCED_TOOLS from '~/lib/tools/advanced-tools';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Popover from '@radix-ui/react-popover';
 
@@ -169,7 +170,7 @@ export function AdvancedToolbar({ onToolSelect, className }: AdvancedToolbarProp
                   <h4 className="text-sm font-medium text-bolt-elements-textSecondary">
                     أدوات {TOOL_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
                   </h4>
-                  {getToolsByCategory(selectedCategory).map((tool, index) => (
+                  {getToolsByCategory(selectedCategory).map((tool, _index) => (
                     <button
                       key={index}
                       onClick={() => handleToolClick(tool)}

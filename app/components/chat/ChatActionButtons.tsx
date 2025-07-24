@@ -10,7 +10,7 @@ interface ChatActionButtonsProps {
 
 export function ChatActionButtons({ onAction, className }: ChatActionButtonsProps) {
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [_isSettingsOpen, _setIsSettingsOpen] = useState(false);
 
   const templates = [
     {
@@ -87,7 +87,7 @@ export function ChatActionButtons({ onAction, className }: ChatActionButtonsProp
     <div className={classNames('flex items-center gap-2', className)}>
       {/* Quick Actions */}
       <div className="flex items-center gap-1">
-        {quickActions.map((action, index) => (
+        {quickActions.map((action, _index) => (
           <Tooltip.Provider key={index}>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -138,7 +138,7 @@ export function ChatActionButtons({ onAction, className }: ChatActionButtonsProp
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {templates.map((template, index) => (
+              {templates.map((template, _index) => (
                 <button
                   key={index}
                   onClick={() => {

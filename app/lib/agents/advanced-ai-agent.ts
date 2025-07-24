@@ -15,7 +15,7 @@ export interface AgentSearchResult {
   query: string;
   results: Array<{
     title: string;
-    content: string;
+    _content: string;
     source: string;
     relevance: number;
   }>;
@@ -317,19 +317,19 @@ export class AdvancedAIAgent {
     const searchResults = [
       {
         title: `${query} - الدليل الشامل`,
-        content: `معلومات شاملة حول ${query} تتضمن أفضل الممارسات والأمثلة العملية`,
+        _content: `معلومات شاملة حول ${query} تتضمن أفضل الممارسات والأمثلة العملية`,
         source: 'developer.mozilla.org',
         relevance: 0.9,
       },
       {
         title: `كيفية استخدام ${query} في المشاريع الحديثة`,
-        content: `دليل عملي لاستخدام ${query} مع أمثلة وحلول للمشاكل الشائعة`,
+        _content: `دليل عملي لاستخدام ${query} مع أمثلة وحلول للمشاكل الشائعة`,
         source: 'stackoverflow.com',
         relevance: 0.8,
       },
       {
         title: `أفضل ممارسات ${query}`,
-        content: `نصائح وتوصيات من الخبراء حول استخدام ${query} بكفاءة`,
+        _content: `نصائح وتوصيات من الخبراء حول استخدام ${query} بكفاءة`,
         source: 'github.com',
         relevance: 0.7,
       },
@@ -340,13 +340,13 @@ export class AdvancedAIAgent {
       searchResults.push(
         {
           title: `${query} - تحليل متقدم`,
-          content: `تحليل تقني متعمق لـ ${query} مع دراسات حالة وأمثلة متقدمة`,
+          _content: `تحليل تقني متعمق لـ ${query} مع دراسات حالة وأمثلة متقدمة`,
           source: 'medium.com',
           relevance: 0.85,
         },
         {
           title: `مقارنة ${query} مع البدائل`,
-          content: `مقارنة شاملة بين ${query} والحلول البديلة مع المزايا والعيوب`,
+          _content: `مقارنة شاملة بين ${query} والحلول البديلة مع المزايا والعيوب`,
           source: 'dev.to',
           relevance: 0.75,
         },
@@ -377,7 +377,7 @@ export class AdvancedAIAgent {
     const knowledge = {
       type: 'searched_knowledge',
       topic,
-      summary: searchResult.results[0]?.content || 'No content available',
+      summary: searchResult.results[0]?._content || 'No _content available',
       sources: searchResult.results.map((r) => r.source),
       lastUpdated: new Date(),
       relevance: searchResult.results[0]?.relevance || 0,
@@ -482,7 +482,7 @@ export class AdvancedAIAgent {
     // إضافة نتائج الأدوات
     if (toolResults.length > 0) {
       answer += '## نتائج الأدوات المستخدمة:\n';
-      toolResults.forEach((result, index) => {
+      toolResults.forEach((result, _index) => {
         if (result.error) {
           answer += `❌ **${result.tool}**: حدث خطأ - ${result.error}\n`;
         } else {
@@ -508,7 +508,7 @@ export class AdvancedAIAgent {
       searchResults.forEach((search) => {
         answer += `**البحث عن: ${search.query}**\n`;
         search.results.slice(0, 2).forEach((result) => {
-          answer += `- ${result.title}: ${result.content.substring(0, 100)}...\n`;
+          answer += `- ${result.title}: ${result._content.substring(0, 100)}...\n`;
         });
       });
       answer += '\n';
@@ -556,7 +556,7 @@ export class AdvancedAIAgent {
   }
 
   getAvailableTools(): string[] {
-    return Array.from(this.availableTools.keys());
+    return Array.from(this.availableTools._keys());
   }
 }
 

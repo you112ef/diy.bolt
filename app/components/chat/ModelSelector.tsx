@@ -1,10 +1,12 @@
 import type { ProviderInfo } from '~/types/model';
-import { useEffect, useState, useRef } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import { classNames } from '~/utils/classNames';
 import { AgentToggleButton } from './AgentToggleButton';
 import { useStore } from '@nanostores/react';
+
 import { agentModelsStore, isModelInAgentMode, getAgentByModel } from '~/lib/stores/agent-mode';
 
 interface ModelSelectorProps {
@@ -27,7 +29,7 @@ export const ModelSelector = ({
   providerList,
   modelLoading,
 }: ModelSelectorProps) => {
-  const agentModels = useStore(agentModelsStore);
+  const _agentModels = useStore(agentModelsStore);
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [focusedModelIndex, setFocusedModelIndex] = useState(-1);
@@ -305,7 +307,7 @@ export const ModelSelector = ({
               {filteredProviders.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">No providers found</div>
               ) : (
-                filteredProviders.map((providerOption, index) => (
+                filteredProviders.map((providerOption, _index) => (
                   <div
                     ref={(el) => (providerOptionsRef.current[index] = el)}
                     key={providerOption.name}
@@ -455,7 +457,7 @@ export const ModelSelector = ({
               ) : filteredModels.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">No models found</div>
               ) : (
-                filteredModels.map((modelOption, index) => {
+                filteredModels.map((modelOption, _index) => {
                   const isAgent = isModelInAgentMode(modelOption.name, provider?.name || '');
                   const agent = getAgentByModel(modelOption.name, provider?.name || '');
 

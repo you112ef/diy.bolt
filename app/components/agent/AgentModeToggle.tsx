@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { agentModelsStore, isModelInAgentMode } from '~/lib/stores/agent-mode';
 import { advancedAIAgent } from '~/lib/agents/advanced-ai-agent';
 import * as Switch from '@radix-ui/react-switch';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { SmoothTransition, AnimatedText } from '~/components/ui/SmoothTransitions';
-import { useTheme } from '~/components/ui/SmartThemeSystem';
-import { usePerformanceMonitor } from '~/lib/hooks/useOptimizedState';
 
 interface AgentModeToggleProps {
   currentModel?: string;
@@ -15,275 +12,225 @@ interface AgentModeToggleProps {
   onAgentModeChange?: (enabled: boolean) => void;
 }
 
-export function AgentModeToggle({ currentModel, currentProvider, onAgentModeChange }: AgentModeToggleProps) {
+export function AgentModeToggle({
+  currentModel,
+  currentProvider,
+  onAgentModeChange
+}: AgentModeToggleProps) {
   const [isAgentMode, setIsAgentMode] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showCapabilities, setShowCapabilities] = useState(false);
   const agentModels = useStore(agentModelsStore);
-  const { colors, isDark } = useTheme();
-  const { markRender } = usePerformanceMonitor('AgentModeToggle');
 
   // فحص ما إذا كان النموذج الحالي يدعم وضع الوكيل
   const isAgentSupported = currentModel && currentProvider && isModelInAgentMode(currentModel, currentProvider);
 
   useEffect(() => {
     if (isAgentSupported) {
-      // تحديث حالة الوكيل عند تغيير النموذج
       setIsAgentMode(true);
       advancedAIAgent.setAgentMode(true);
     } else {
       setIsAgentMode(false);
       advancedAIAgent.setAgentMode(false);
     }
-  }, [currentModel, currentProvider, isAgentSupported]);
+  }, [isAgentSupported]);
 
-  const handleToggle = async (enabled: boolean) => {
-    if (!currentModel || !currentProvider) {
-      return;
-    }
-
+  const handleToggle = async (checked: boolean) => {
+    if (isTransitioning) return;
+    
     setIsTransitioning(true);
-
+    
     try {
-      // تحديث حالة الوكيل
-      setIsAgentMode(enabled);
-      advancedAIAgent.setAgentMode(enabled);
-
-      // إشعار المكون الأب
-      onAgentModeChange?.(enabled);
-
-      // إضافة تأخير قصير للانتقال السلس
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      setIsAgentMode(checked);
+      advancedAIAgent.setAgentMode(checked);
+      onAgentModeChange?.(checked);
+      
+      // محاكاة تأخير للانتقال السلس
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) {
+      console.error('Error toggling agent mode:', error);
+      setIsAgentMode(!checked);
     } finally {
       setIsTransitioning(false);
     }
   };
 
-  const getAgentCapabilities = () => {
-    if (!isAgentMode) {
-      return [];
+  const capabilities = [
+    {
+      name: 'التفكير التلقائي',
+      description: 'يفكر ويحلل المشاكل تلقائياً',
+      icon: '🧠',
+      active: isAgentMode
+    },
+    {
+      name: 'اختيار الأدوات',
+      description: 'يختار الأدوات المناسبة للمهمة',
+      icon: '🛠️',
+      active: isAgentMode
+    },
+    {
+      name: 'البحث الذكي',
+      description: 'يبحث عن المعلومات المطلوبة',
+      icon: '🔍',
+      active: isAgentMode
+    },
+    {
+      name: 'تحسين الكود',
+      description: 'يحسن ويراجع الكود تلقائياً',
+      icon: '⚡',
+      active: isAgentMode
     }
+  ];
 
-    return [
-      { name: 'التفكير التلقائي', icon: 'i-ph:brain-duotone', color: 'text-blue-500' },
-      { name: 'اختيار الأدوات', icon: 'i-ph:wrench-duotone', color: 'text-orange-500' },
-      { name: 'البحث الذكي', icon: 'i-ph:magnifying-glass-duotone', color: 'text-purple-500' },
-      { name: 'البحث العميق', icon: 'i-ph:telescope-duotone', color: 'text-indigo-500' },
-      { name: 'جمع المعلومات', icon: 'i-ph:database-duotone', color: 'text-green-500' },
-      { name: 'تحليل الكود', icon: 'i-ph:code-duotone', color: 'text-cyan-500' },
-      { name: 'تحسين الأداء', icon: 'i-ph:lightning-duotone', color: 'text-yellow-500' },
-      { name: 'تحليل الأمان', icon: 'i-ph:shield-duotone', color: 'text-red-500' },
-    ];
-  };
-
-  if (!currentModel || !currentProvider) {
-    return null;
+  if (!isAgentSupported) {
+    return (
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+          <span className="text-sm font-medium text-gray-600">
+            وضع الوكيل غير متاح
+          </span>
+        </div>
+        <p className="text-xs text-gray-500">
+          النموذج الحالي لا يدعم وضع الوكيل الذكي
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Toggle Switch */}
-      <div className="flex items-center justify-between p-3 bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor rounded-lg">
+    <div className="space-y-4">
+      {/* Agent Mode Switch */}
+      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center gap-3">
-          <div
-            className={classNames(
-              'i-ph:robot-duotone text-xl transition-colors',
-              isAgentMode ? 'text-blue-500' : 'text-bolt-elements-textSecondary',
-            )}
-          />
+          <div className={classNames(
+            'w-3 h-3 rounded-full transition-colors duration-300',
+            isAgentMode ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+          )}></div>
           <div>
-            <div className="text-sm font-medium text-bolt-elements-textPrimary">Agent Mode</div>
-            <div className="text-xs text-bolt-elements-textSecondary">
-              {isAgentMode ? 'الوكيل الذكي نشط' : 'الوضع العادي'}
-            </div>
+            <h3 className="text-sm font-semibold text-gray-900">
+              وضع الوكيل الذكي
+            </h3>
+            <p className="text-xs text-gray-500">
+              {isAgentMode ? 'نشط - يعمل بذكاء اصطناعي متقدم' : 'غير نشط'}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isTransitioning && <div className="i-svg-spinners:90-ring-with-bg text-blue-500 animate-spin text-sm" />}
-
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <div>
-                  <Switch.Root
-                    checked={isAgentMode}
-                    onCheckedChange={handleToggle}
-                    disabled={isTransitioning}
-                    className={classNames(
-                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-                      isAgentMode ? 'bg-blue-500' : 'bg-gray-300',
-                      isTransitioning ? 'opacity-50 cursor-not-allowed' : '',
-                    )}
-                  >
-                    <Switch.Thumb
-                      className={classNames(
-                        'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-                        isAgentMode ? 'translate-x-6' : 'translate-x-1',
-                      )}
-                    />
-                  </Switch.Root>
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-3 py-2 rounded-md text-sm shadow-lg border border-bolt-elements-borderColor z-50">
-                  {isAgentMode ? 'تعطيل وضع الوكيل الذكي' : 'تفعيل وضع الوكيل الذكي للتفكير التلقائي واستخدام الأدوات'}
-                  <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        </div>
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Switch.Root
+                checked={isAgentMode}
+                onCheckedChange={handleToggle}
+                disabled={isTransitioning}
+                className={classNames(
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+                  isAgentMode ? 'bg-blue-500' : 'bg-gray-300',
+                  isTransitioning ? 'opacity-50 cursor-not-allowed' : ''
+                )}
+              >
+                <Switch.Thumb
+                  className={classNames(
+                    'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                    isAgentMode ? 'translate-x-6' : 'translate-x-1'
+                  )}
+                />
+              </Switch.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content
+              className="px-3 py-2 text-xs bg-gray-900 text-white rounded shadow-lg max-w-xs"
+              sideOffset={5}
+            >
+              {isAgentMode ? 'إيقاف وضع الوكيل' : 'تفعيل وضع الوكيل'}
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       </div>
 
-      {/* Agent Capabilities */}
-      <SmoothTransition
-        config={{
-          type: 'slide-down',
-          duration: 'normal',
-          triggerOnMount: false,
-        }}
-        show={isAgentMode}
-      >
-        <div
-          className="p-3 border rounded-lg"
-          style={{
-            backgroundColor: colors.surface.card,
-            borderColor: colors.border.primary,
-          }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <AnimatedText
-              text="قدرات الوكيل الذكي النشطة:"
-              className="text-xs font-medium"
-              animationType="fade-in-words"
-            />
+      {/* Agent Capabilities - عرض القدرات */}
+      {isAgentMode && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-gray-700">
+              قدرات الوكيل النشطة:
+            </h4>
             <button
-              onClick={() => {
-                markRender('capabilities-toggle');
-                setShowCapabilities(!showCapabilities);
-              }}
-              className="text-xs px-2 py-1 rounded transition-all hover:scale-105"
-              style={{
-                backgroundColor: colors.surface.elevated,
-                color: colors.text.secondary,
-                border: `1px solid ${colors.border.primary}`,
-              }}
+              onClick={() => setShowCapabilities(!showCapabilities)}
+              className="text-xs text-blue-600 hover:text-blue-700 transition-colors"
             >
-              {showCapabilities ? 'إخفاء' : 'عرض التفاصيل'}
+              {showCapabilities ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
             </button>
           </div>
 
-          <SmoothTransition
-            config={{
-              type: 'scale',
-              duration: 'normal',
-              triggerOnMount: false,
-            }}
-            show={showCapabilities}
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {getAgentCapabilities().map((capability, index) => (
-                <SmoothTransition
+          {showCapabilities && (
+            <div className="grid grid-cols-2 gap-2">
+              {capabilities.map((capability, index) => (
+                <div
                   key={index}
-                  config={{
-                    type: 'slide-up',
-                    duration: 'fast',
-                    delay: index * 50,
-                    triggerOnMount: true,
-                  }}
+                  className={classNames(
+                    'p-3 rounded-lg border transition-all duration-300',
+                    capability.active
+                      ? 'bg-green-50 border-green-200 shadow-sm'
+                      : 'bg-gray-50 border-gray-200'
+                  )}
                 >
-                  <Tooltip.Provider>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger asChild>
-                        <div
-                          className="flex items-center gap-2 p-2 rounded-md transition-all cursor-default hover:scale-105"
-                          style={{
-                            backgroundColor: colors.surface.elevated,
-                            border: `1px solid ${colors.border.secondary}`,
-                            color: colors.text.primary,
-                          }}
-                        >
-                          <div className={classNames(capability.icon, 'text-sm', capability.color)} />
-                          <span className="text-xs truncate">{capability.name}</span>
-                        </div>
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        <Tooltip.Content
-                          className="px-3 py-2 rounded-md text-sm shadow-lg z-50"
-                          style={{
-                            backgroundColor: colors.surface.overlay,
-                            color: colors.text.inverse,
-                            border: `1px solid ${colors.border.primary}`,
-                          }}
-                        >
-                          {capability.name} - متاح في وضع الوكيل
-                          <Tooltip.Arrow style={{ fill: colors.surface.overlay }} />
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
-                  </Tooltip.Provider>
-                </SmoothTransition>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{capability.icon}</span>
+                    <span className={classNames(
+                      'text-xs font-medium',
+                      capability.active ? 'text-green-700' : 'text-gray-600'
+                    )}>
+                      {capability.name}
+                    </span>
+                  </div>
+                  <p className={classNames(
+                    'text-xs',
+                    capability.active ? 'text-green-600' : 'text-gray-500'
+                  )}>
+                    {capability.description}
+                  </p>
+                </div>
               ))}
             </div>
-          </SmoothTransition>
+          )}
         </div>
-      </SmoothTransition>
+      )}
 
       {/* Agent Status */}
-      <SmoothTransition
-        config={{
-          type: 'fade',
-          duration: 'normal',
-          triggerOnMount: false,
-        }}
-        show={isAgentMode}
-      >
-        <div
-          className="flex items-center gap-3 p-3 rounded-lg border"
-          style={{
-            backgroundColor: `${colors.status.info}20`,
-            borderColor: `${colors.status.info}40`,
-          }}
-        >
-          <div className="relative">
-            <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: colors.status.info }} />
-            <div
-              className="absolute inset-0 w-3 h-3 rounded-full animate-ping opacity-75"
-              style={{ backgroundColor: colors.status.info }}
-            />
-          </div>
-          <AnimatedText
-            text="الوكيل الذكي جاهز - سيقوم بالتفكير واختيار الأدوات المناسبة تلقائياً"
-            className="text-xs flex-1"
-            animationType="typewriter"
-            speed={30}
-          />
-        </div>
-      </SmoothTransition>
-
-      {/* Model Support Info */}
-      <SmoothTransition
-        config={{
-          type: 'slide-down',
-          duration: 'normal',
-          triggerOnMount: false,
-        }}
-        show={!isAgentSupported && !!currentModel}
-      >
-        <div
-          className="flex items-center gap-2 p-2 rounded-lg border"
-          style={{
-            backgroundColor: `${colors.status.warning}20`,
-            borderColor: `${colors.status.warning}40`,
-          }}
-        >
-          <div className="i-ph:warning-duotone" style={{ color: colors.status.warning }} />
-          <span className="text-xs" style={{ color: colors.status.warning }}>
-            النموذج الحالي ({currentModel}) لا يدعم وضع الوكيل الذكي
+      {isAgentMode && (
+        <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+          <span className="text-xs text-blue-700 flex-1">
+            الوكيل الذكي جاهز - سيقوم بالتفكير واختيار الأدوات المناسبة تلقائياً
           </span>
         </div>
-      </SmoothTransition>
+      )}
+
+      {/* Model Support Info */}
+      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span className="text-xs font-medium text-gray-700">
+            معلومات النموذج:
+          </span>
+        </div>
+        <div className="space-y-1 text-xs text-gray-600">
+          <div>النموذج: {currentModel || 'غير محدد'}</div>
+          <div>المزود: {currentProvider || 'غير محدد'}</div>
+          <div className="flex items-center gap-1">
+            <span>دعم الوكيل:</span>
+            <span className={classNames(
+              'px-2 py-0.5 rounded text-xs font-medium',
+              isAgentSupported
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            )}>
+              {isAgentSupported ? 'مدعوم' : 'غير مدعوم'}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

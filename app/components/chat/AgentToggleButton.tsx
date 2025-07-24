@@ -1,6 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
-import { toggleAgentMode, isModelInAgentMode, getAgentByModel, agentModelsStore } from '~/lib/stores/agent-mode';
+
+// import isModelInAgentMode from '~/lib/stores/agent-mode';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface AgentToggleButtonProps {
@@ -10,7 +11,7 @@ interface AgentToggleButtonProps {
 }
 
 export function AgentToggleButton({ modelName, providerName, className }: AgentToggleButtonProps) {
-  const agentModels = useStore(agentModelsStore);
+  const _agentModels = useStore(agentModelsStore);
   const isAgent = isModelInAgentMode(modelName, providerName);
   const agent = getAgentByModel(modelName, providerName);
 
