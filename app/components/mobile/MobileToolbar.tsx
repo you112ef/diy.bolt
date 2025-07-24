@@ -166,13 +166,11 @@ export function MobileToolbar({ onExecuteCommand, currentModel, currentProvider 
       </div>
 
       {/* Control Panel */}
-      <ControlPanel
-        isOpen={isControlPanelOpen}
-        onClose={() => setIsControlPanelOpen(false)}
-        onExecuteCommand={onExecuteCommand}
-        currentModel={currentModel}
-        currentProvider={currentProvider}
-      />
+      {isControlPanelOpen && (
+        <ControlPanel
+          onClose={() => setIsControlPanelOpen(false)}
+        />
+      )}
 
       {/* Files Panel */}
       {activeItem === 'files' && (
