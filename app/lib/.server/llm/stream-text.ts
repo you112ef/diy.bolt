@@ -36,6 +36,7 @@ export async function streamText(props: {
   contextFiles?: FileMap;
   summary?: string;
   messageSliceId?: number;
+  agentSystemPrompt?: string;
 }) {
   const {
     messages,
@@ -48,6 +49,7 @@ export async function streamText(props: {
     contextOptimization,
     contextFiles,
     summary,
+    agentSystemPrompt,
   } = props;
   let currentModel = DEFAULT_MODEL;
   let currentProvider = DEFAULT_PROVIDER.name;
@@ -119,7 +121,16 @@ export async function streamText(props: {
         hasSelectedProject: options?.supabaseConnection?.hasSelectedProject || false,
         credentials: options?.supabaseConnection?.credentials || undefined,
       },
-    }) ?? getSystemPrompt();
+    }) ??
+    getSystemPrompt(
+      WORK_DIR,
+      {
+        isConnected: options?.supabaseConnection?.isConnected || false,
+        hasSelectedProject: options?.supabaseConnection?.hasSelectedProject || false,
+        credentials: options?.supabaseConnection?.credentials || undefined,
+      },
+      agentSystemPrompt,
+    );
 
   if (contextFiles && contextOptimization) {
     const codeContext = createFilesContext(contextFiles, true);

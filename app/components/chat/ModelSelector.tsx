@@ -3,6 +3,9 @@ import { useEffect, useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import { classNames } from '~/utils/classNames';
+import { AgentToggleButton } from './AgentToggleButton';
+import { useStore } from '@nanostores/react';
+import { agentModelsStore, isModelInAgentMode, getAgentByModel } from '~/lib/stores/agent-mode';
 
 interface ModelSelectorProps {
   model?: string;
@@ -24,6 +27,7 @@ export const ModelSelector = ({
   providerList,
   modelLoading,
 }: ModelSelectorProps) => {
+  const agentModels = useStore(agentModelsStore);
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [focusedModelIndex, setFocusedModelIndex] = useState(-1);
@@ -368,13 +372,34 @@ export const ModelSelector = ({
           tabIndex={0}
         >
           <div className="flex items-center justify-between">
-            <div className="truncate">{modelList.find((m) => m.name === model)?.label || 'Select model'}</div>
-            <div
-              className={classNames(
-                'i-ph:caret-down w-4 h-4 text-bolt-elements-textSecondary opacity-75',
-                isModelDropdownOpen ? 'rotate-180' : undefined,
+            <div className="flex items-center gap-2 truncate">
+              {model && provider && isModelInAgentMode(model, provider.name) && (
+                <div className="i-ph:robot-duotone text-blue-500 text-sm" />
               )}
-            />
+              <span
+                className={classNames(
+                  model && provider && isModelInAgentMode(model, provider.name) ? 'text-blue-400 font-medium' : '',
+                )}
+              >
+                {model && provider && isModelInAgentMode(model, provider.name)
+                  ? getAgentByModel(model, provider.name)?.agentName
+                  : modelList.find((m) => m.name === model)?.label || 'Select model'}
+              </span>
+              {model && provider && isModelInAgentMode(model, provider.name) && (
+                <span className="text-xs text-bolt-elements-textTertiary">(Agent)</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {model && provider && (
+                <AgentToggleButton modelName={model} providerName={provider.name} className="scale-75" />
+              )}
+              <div
+                className={classNames(
+                  'i-ph:caret-down w-4 h-4 text-bolt-elements-textSecondary opacity-75',
+                  isModelDropdownOpen ? 'rotate-180' : undefined,
+                )}
+              />
+            </div>
           </div>
         </div>
 
@@ -430,33 +455,54 @@ export const ModelSelector = ({
               ) : filteredModels.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">No models found</div>
               ) : (
-                filteredModels.map((modelOption, index) => (
-                  <div
-                    ref={(el) => (modelOptionsRef.current[index] = el)}
-                    key={index} // Consider using modelOption.name if unique
-                    role="option"
-                    aria-selected={model === modelOption.name}
-                    className={classNames(
-                      'px-3 py-2 text-sm cursor-pointer',
-                      'hover:bg-bolt-elements-background-depth-3',
-                      'text-bolt-elements-textPrimary',
-                      'outline-none',
-                      model === modelOption.name || focusedModelIndex === index
-                        ? 'bg-bolt-elements-background-depth-2'
-                        : undefined,
-                      focusedModelIndex === index ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
-                    )}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setModel?.(modelOption.name);
-                      setIsModelDropdownOpen(false);
-                      setModelSearchQuery('');
-                    }}
-                    tabIndex={focusedModelIndex === index ? 0 : -1}
-                  >
-                    {modelOption.label}
-                  </div>
-                ))
+                filteredModels.map((modelOption, index) => {
+                  const isAgent = isModelInAgentMode(modelOption.name, provider?.name || '');
+                  const agent = getAgentByModel(modelOption.name, provider?.name || '');
+
+                  return (
+                    <div
+                      ref={(el) => (modelOptionsRef.current[index] = el)}
+                      key={index} // Consider using modelOption.name if unique
+                      role="option"
+                      aria-selected={model === modelOption.name}
+                      className={classNames(
+                        'px-3 py-2 text-sm cursor-pointer flex items-center justify-between group',
+                        'hover:bg-bolt-elements-background-depth-3',
+                        'text-bolt-elements-textPrimary',
+                        'outline-none',
+                        model === modelOption.name || focusedModelIndex === index
+                          ? 'bg-bolt-elements-background-depth-2'
+                          : undefined,
+                        focusedModelIndex === index ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setModel?.(modelOption.name);
+                        setIsModelDropdownOpen(false);
+                        setModelSearchQuery('');
+                      }}
+                      tabIndex={focusedModelIndex === index ? 0 : -1}
+                    >
+                      <div className="flex items-center gap-2 flex-1">
+                        {isAgent && <div className="i-ph:robot-duotone text-blue-500 text-sm" />}
+                        <span className={classNames(isAgent ? 'text-blue-400 font-medium' : '')}>
+                          {isAgent ? agent?.agentName : modelOption.label}
+                        </span>
+                        {isAgent && <span className="text-xs text-bolt-elements-textTertiary">(Agent Mode)</span>}
+                      </div>
+                      <div
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <AgentToggleButton
+                          modelName={modelOption.name}
+                          providerName={provider?.name || ''}
+                          className="scale-75"
+                        />
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
