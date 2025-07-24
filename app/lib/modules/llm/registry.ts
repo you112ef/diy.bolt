@@ -16,6 +16,8 @@ import XAIProvider from './providers/xai';
 import HyperbolicProvider from './providers/hyperbolic';
 import AmazonBedrockProvider from './providers/amazon-bedrock';
 import GithubProvider from './providers/github';
+import ClaudeEnhancedProvider from './providers/claude-enhanced';
+import GPTEnhancedProvider from './providers/gpt-enhanced';
 
 export {
   AnthropicProvider,
@@ -36,4 +38,6 @@ export {
   LMStudioProvider,
   AmazonBedrockProvider,
   GithubProvider,
+  ClaudeEnhancedProvider,
+  GPTEnhancedProvider,
 };
