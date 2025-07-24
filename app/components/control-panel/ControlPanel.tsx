@@ -30,7 +30,7 @@ export function ControlPanel({ isOpen, onClose, onExecuteCommand, currentModel, 
   const [showPluginManager, setShowPluginManager] = useState(false);
   const agentModels = useStore(agentModelsStore);
   const { isAgentMode, toggleAgentMode, agentResponse } = useAgentMode();
-  const { colors, isDark } = useTheme();
+  const { colors, theme } = useTheme();
   const { markRender } = usePerformanceMonitor('ControlPanel');
 
   useEffect(() => {
@@ -170,8 +170,7 @@ export function ControlPanel({ isOpen, onClose, onExecuteCommand, currentModel, 
               <div>
                 <AnimatedText
                   text="لوحة التحكم المطور"
-                  className="text-sm sm:text-lg font-bold"
-                  style={{ color: colors.text.primary }}
+                  className="text-sm sm:text-lg font-bold text-gray-900"
                   animationType="fade-in-words"
                 />
                 <div className="text-xs sm:text-sm opacity-70" style={{ color: colors.text.secondary }}>
@@ -366,7 +365,6 @@ export function ControlPanel({ isOpen, onClose, onExecuteCommand, currentModel, 
                             <div className="flex-1 min-w-0">
                               <h3 
                                 className="font-semibold text-sm sm:text-base mb-1 truncate"
-                                style={{ color: colors.text.primary }}
                               >
                                 {action.title}
                               </h3>
@@ -403,7 +401,6 @@ export function ControlPanel({ isOpen, onClose, onExecuteCommand, currentModel, 
                       <div className="mt-4 sm:mt-6">
                         <h3 
                           className="text-sm sm:text-base font-semibold mb-2 sm:mb-3"
-                          style={{ color: colors.text.primary }}
                         >
                           نتيجة التنفيذ:
                         </h3>
@@ -435,10 +432,11 @@ export function ControlPanel({ isOpen, onClose, onExecuteCommand, currentModel, 
       />
 
       {/* Plugin Manager Modal */}
-      <PluginManager
-        isVisible={showPluginManager}
-        onClose={() => setShowPluginManager(false)}
-      />
+      {showPluginManager && (
+        <PluginManager
+          onClose={() => setShowPluginManager(false)}
+        />
+      )}
     </Dialog.Root>
   );
 }

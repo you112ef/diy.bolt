@@ -1,565 +1,340 @@
 import React, { useState, useEffect } from 'react';
 import { pluginSystem } from '~/lib/plugins/PluginSystem';
 import type { PluginType, PluginStatus, InstalledPlugin } from '~/lib/plugins/PluginSystem';
-import { SmoothTransition, AnimatedText } from '~/components/ui/SmoothTransitions';
 import { useTheme } from '~/components/ui/SmartThemeSystem';
-import { usePerformanceMonitor, useMemoizedValue } from '~/lib/hooks/useOptimizedState';
+import { usePerformanceMonitor } from '~/lib/hooks/useOptimizedState';
 import { classNames } from '~/utils/classNames';
-import * as Tabs from '@radix-ui/react-tabs';
 import * as Dialog from '@radix-ui/react-dialog';
-import * as Switch from '@radix-ui/react-switch';
-
-// import Progress from '@radix-ui/react-progress';
+import * as Tabs from '@radix-ui/react-tabs';
 
 interface PluginManagerProps {
-  isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-export function PluginManager({ isOpen, onClose }: PluginManagerProps) {
-  const [_activeTab, _setActiveTab] = useState('installed');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<PluginType | 'all'>('all');
-  const [plugins, setPlugins] = useState<Map<string, InstalledPlugin>>(new Map());
-  const [isLoading, setIsLoading] = useState(false);
+export function PluginManager({ onClose }: PluginManagerProps) {
+  const [activeTab, setActiveTab] = useState('installed');
   const [selectedPlugin, setSelectedPlugin] = useState<InstalledPlugin | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<PluginType | 'all'>('all');
+  
+  const { colors, theme } = useTheme();
+  const { markRender } = usePerformanceMonitor('PluginManager');
 
-  const { _colors, _isDark } = useTheme();
-  const { _getStatusColor } = useAdaptiveColors();
-  const { _markRender } = usePerformanceMonitor('PluginManager');
+  // Real plugin data
+  const [installedPlugins, setInstalledPlugins] = useState<InstalledPlugin[]>([]);
+  const [availablePlugins, setAvailablePlugins] = useState<any[]>([]);
 
-  // تحديث قائمة الـ Plugins
   useEffect(() => {
-    const updatePlugins = () => {
-      setPlugins(pluginSystem.getAllPlugins());
-    };
+    markRender('mount');
+    loadPlugins();
+  }, [markRender]);
 
-    updatePlugins();
-
-    // الاستماع للتغييرات
-    pluginSystem.on('pluginInstalled', updatePlugins);
-    pluginSystem.on('pluginUninstalled', updatePlugins);
-    pluginSystem.on('pluginStatusChanged', updatePlugins);
-
-    return () => {
-      pluginSystem.off('pluginInstalled', updatePlugins);
-      pluginSystem.off('pluginUninstalled', updatePlugins);
-      pluginSystem.off('pluginStatusChanged', updatePlugins);
-    };
-  }, []);
-
-  // تصفية الـ Plugins
-  const filteredPlugins = useMemoizedValue(
-    () => {
-      let filtered = Array.from(plugins.values());
-
-      // تصفية حسب البحث
-      if (searchQuery) {
-        filtered = pluginSystem.searchPlugins(searchQuery);
-      }
-
-      // تصفية حسب النوع
-      if (selectedType !== 'all') {
-        filtered = filtered.filter((p) => p.plugin.manifest.type === selectedType);
-      }
-
-      return filtered;
-    },
-    [plugins, searchQuery, selectedType],
-    { maxAge: 1000 },
-  );
-
-  // إحصائيات النظام
-  const systemStats = useMemoizedValue(
-    () => {
-      return pluginSystem.getSystemStats();
-    },
-    [plugins],
-    { maxAge: 5000 },
-  );
-
-  // تفعيل/إلغاء تفعيل Plugin
-  const togglePlugin = async (id: string, currentStatus: PluginStatus) => {
-    setIsLoading(true);
-    _markRender('plugin-toggle');
-
+  const loadPlugins = async () => {
     try {
-      if (currentStatus === 'active') {
-        await pluginSystem.deactivatePlugin(id);
-      } else {
-        await pluginSystem.activatePlugin(id);
-      }
+      // Load real installed plugins
+      const installedMap = pluginSystem.getAllPlugins();
+      const installed = Array.from(installedMap.values());
+      setInstalledPlugins(installed);
+
+      // Mock available plugins - in real app this would come from a registry
+      const available = [
+        {
+          id: 'code-formatter',
+          name: 'Code Formatter Pro',
+          description: 'تنسيق الكود بشكل احترافي مع دعم عدة لغات',
+          version: '2.1.0',
+          author: 'DevTools Team',
+          category: 'development' as PluginType,
+          rating: 4.8,
+          downloads: 15420,
+          tags: ['formatting', 'code', 'productivity'],
+          icon: '🎨'
+        },
+        {
+          id: 'ai-assistant',
+          name: 'AI Code Assistant',
+          description: 'مساعد ذكي لكتابة وتحسين الكود',
+          version: '1.5.2',
+          author: 'AI Solutions',
+          category: 'ai' as PluginType,
+          rating: 4.9,
+          downloads: 28350,
+          tags: ['ai', 'assistant', 'coding'],
+          icon: '🤖'
+        },
+        {
+          id: 'theme-manager',
+          name: 'Advanced Theme Manager',
+          description: 'إدارة وتخصيص ثيمات المحرر',
+          version: '3.0.1',
+          author: 'UI Team',
+          category: 'ui' as PluginType,
+          rating: 4.6,
+          downloads: 12890,
+          tags: ['theme', 'ui', 'customization'],
+          icon: '🎭'
+        }
+      ];
+      setAvailablePlugins(available);
     } catch (error) {
-      console.error('Failed to toggle plugin:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error loading plugins:', error);
     }
   };
 
-  // حذف Plugin
-  const uninstallPlugin = async (id: string) => {
-    setIsLoading(true);
-    _markRender('plugin-uninstall');
+  const filteredPlugins = installedPlugins.filter(plugin => {
+    const matchesSearch = plugin.plugin.manifest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         plugin.plugin.manifest.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || plugin.plugin.manifest.type === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
+  const handleInstallPlugin = async (pluginId: string) => {
     try {
-      await pluginSystem.uninstallPlugin(id);
+      // In real implementation, this would install from registry
+      console.log('Installing plugin:', pluginId);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate installation
+      loadPlugins(); // Reload plugins
+    } catch (error) {
+      console.error('Error installing plugin:', error);
+    }
+  };
+
+  const handleUninstallPlugin = async (pluginId: string) => {
+    try {
+      await pluginSystem.uninstallPlugin(pluginId);
+      loadPlugins(); // Reload plugins
       setSelectedPlugin(null);
     } catch (error) {
-      console.error('Failed to uninstall plugin:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error uninstalling plugin:', error);
     }
   };
 
-  // الحصول على لون الحالة
-  const getPluginStatusColor = (status: PluginStatus) => {
-    switch (status) {
-      case 'active':
-        return _colors.status.success;
-      case 'inactive':
-        return _colors.text.secondary;
-      case 'error':
-        return _colors.status.error;
-      case 'loading':
-        return _colors.status.info;
-      default:
-        return _colors.text.secondary;
+  const handleTogglePlugin = async (pluginId: string, active: boolean) => {
+    try {
+      if (active) {
+        await pluginSystem.activatePlugin(pluginId);
+      } else {
+        await pluginSystem.deactivatePlugin(pluginId);
+      }
+      loadPlugins(); // Reload plugins
+    } catch (error) {
+      console.error('Error toggling plugin:', error);
     }
   };
-
-  // الحصول على أيقونة الحالة
-  const getPluginStatusIcon = (status: PluginStatus) => {
-    switch (status) {
-      case 'active':
-        return 'i-ph:check-circle-duotone';
-      case 'inactive':
-        return 'i-ph:circle-duotone';
-      case 'error':
-        return 'i-ph:warning-circle-duotone';
-      case 'loading':
-        return 'i-ph:spinner-duotone';
-      default:
-        return 'i-ph:circle-duotone';
-    }
-  };
-
-  if (!isOpen) {
-    return null;
-  }
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
+    <Dialog.Root open={true} onOpenChange={onClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-lg shadow-2xl z-50"
-          style={{
-            backgroundColor: _colors.surface.card,
-            border: `1px solid ${_colors.border.primary}`,
-          }}
-        >
-          <SmoothTransition
-            config={{
-              type: 'scale',
-              duration: 'normal',
-              triggerOnMount: true,
-            }}
-          >
-            {/* Header */}
-            <div
-              className="flex items-center justify-between p-4 border-b"
-              style={{ borderColor: _colors.border.primary }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="i-ph:puzzle-piece-duotone text-2xl" style={{ color: _colors.primary }} />
-                <div>
-                  <AnimatedText text="إدارة الإضافات" className="text-lg font-semibold" animationType="fade-in-words" />
-                  <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                    إدارة وتخصيص إضافات التطبيق
-                  </div>
-                </div>
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[95vw] max-w-5xl h-[90vh] max-h-[800px] bg-white rounded-xl border border-gray-200 shadow-2xl overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">🔌</span>
               </div>
-
-              <div className="flex items-center gap-2">
-                {/* إحصائيات سريعة */}
-                <div className="flex items-center gap-4 text-sm mr-4">
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: _colors.status.success }} />
-                    <span style={{ color: _colors.text.secondary }}>{systemStats.active} نشط</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: _colors.text.secondary }} />
-                    <span style={{ color: _colors.text.secondary }}>{systemStats.total} إجمالي</span>
-                  </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  مدير الإضافات
+                </h2>
+                <div className="text-sm text-gray-500">
+                  إدارة وتثبيت الإضافات
                 </div>
-
-                <Dialog.Close asChild>
-                  <button
-                    className="p-2 rounded-lg transition-_colors hover:scale-105"
-                    style={{
-                      backgroundColor: _colors.surface.elevated,
-                      color: _colors.text.secondary,
-                    }}
-                  >
-                    <div className="i-ph:x text-lg" />
-                  </button>
-                </Dialog.Close>
               </div>
             </div>
 
-            <div className="flex h-full">
-              {/* Sidebar */}
-              <div className="w-80 border-r flex flex-col" style={{ borderColor: _colors.border.primary }}>
-                {/* Search */}
-                <div className="p-4 border-b" style={{ borderColor: _colors.border.primary }}>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="البحث في الإضافات..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 rounded-lg border text-sm"
-                      style={{
-                        backgroundColor: _colors.surface.elevated,
-                        borderColor: _colors.border.primary,
-                        color: _colors.text.primary,
-                      }}
-                    />
-                    <div
-                      className="absolute left-3 top-2.5 i-ph:magnifying-glass text-lg"
-                      style={{ color: _colors.text.secondary }}
-                    />
-                  </div>
-                </div>
+            <Dialog.Close asChild>
+              <button className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="w-5 h-5">✕</div>
+              </button>
+            </Dialog.Close>
+          </div>
 
-                {/* Filters */}
-                <div className="p-4 border-b" style={{ borderColor: _colors.border.primary }}>
-                  <div className="text-sm font-medium mb-2" style={{ color: _colors.text.primary }}>
-                    تصفية حسب النوع
-                  </div>
-                  <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value as PluginType | 'all')}
-                    className="w-full p-2 rounded border text-sm"
-                    style={{
-                      backgroundColor: _colors.surface.elevated,
-                      borderColor: _colors.border.primary,
-                      color: _colors.text.primary,
-                    }}
+          {/* Content */}
+          <div className="flex-1 overflow-hidden">
+            <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+              {/* Tab Navigation */}
+              <Tabs.List className="flex border-b border-gray-200 shrink-0 bg-gray-50">
+                {[
+                  { value: 'installed', label: 'المثبتة', icon: '📦', count: installedPlugins.length },
+                  { value: 'available', label: 'المتاحة', icon: '🌐', count: availablePlugins.length },
+                  { value: 'settings', label: 'الإعدادات', icon: '⚙️' }
+                ].map((tab) => (
+                  <Tabs.Trigger
+                    key={tab.value}
+                    value={tab.value}
+                    className={classNames(
+                      'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors',
+                      'hover:bg-white border-b-2 border-transparent',
+                      'data-[state=active]:bg-white data-[state=active]:border-purple-500 data-[state=active]:text-purple-600'
+                    )}
                   >
-                    <option value="all">جميع الأنواع</option>
-                    <option value="development-tool">أدوات التطوير</option>
-                    <option value="code-editor">محرر الكود</option>
-                    <option value="ai-assistant">مساعد ذكي</option>
-                    <option value="build-tool">أدوات البناء</option>
-                    <option value="deployment">النشر</option>
-                    <option value="analytics">التحليلات</option>
-                    <option value="theme">الثيمات</option>
-                    <option value="integration">التكامل</option>
-                  </select>
-                </div>
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded-full">
+                        {tab.count}
+                      </span>
+                    )}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
 
-                {/* Plugin List */}
-                <div className="flex-1 overflow-auto">
-                  {filteredPlugins.length === 0 ? (
-                    <div className="p-4 text-center">
-                      <div className="i-ph:package text-4xl mb-2" style={{ color: _colors.text.secondary }} />
-                      <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                        لا توجد إضافات
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-2 space-y-2">
-                      {filteredPlugins.map((plugin, _index) => (
-                        <SmoothTransition
-                          key={plugin.context.id}
-                          config={{
-                            type: 'slide-right',
-                            duration: 'fast',
-                            delay: index * 50,
-                            triggerOnMount: true,
-                          }}
-                        >
+              {/* Tab Content */}
+              <div className="flex-1 overflow-hidden">
+                {/* Installed Plugins Tab */}
+                <Tabs.Content value="installed" className="h-full flex">
+                  <div className="flex-1 p-4 overflow-y-auto">
+                    {/* Search and Filters */}
+                    <div className="mb-6 space-y-4">
+                      <input
+                        type="text"
+                        placeholder="البحث في الإضافات..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                      
+                      <div className="flex gap-2 flex-wrap">
+                        {[
+                          { value: 'all', label: 'الكل' },
+                          { value: 'development', label: 'تطوير' },
+                          { value: 'ai', label: 'ذكاء اصطناعي' },
+                          { value: 'ui', label: 'واجهة' },
+                          { value: 'productivity', label: 'إنتاجية' }
+                        ].map((category) => (
                           <button
-                            onClick={() => setSelectedPlugin(plugin)}
+                            key={category.value}
+                            onClick={() => setSelectedCategory(category.value as any)}
                             className={classNames(
-                              'w-full p-3 rounded-lg border text-left transition-all hover:scale-[1.02]',
-                              selectedPlugin?.context.id === plugin.context.id ? 'ring-2' : '',
+                              'px-3 py-1 text-sm rounded-lg transition-colors',
+                              selectedCategory === category.value
+                                ? 'bg-purple-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             )}
-                            style={{
-                              backgroundColor:
-                                selectedPlugin?.context.id === plugin.context.id
-                                  ? _colors.surface.elevated
-                                  : _colors.surface.card,
-                              borderColor:
-                                selectedPlugin?.context.id === plugin.context.id
-                                  ? _colors.primary
-                                  : _colors.border.primary,
-                              outline: `2px solid ${_colors.primary}`,
-                            }}
                           >
-                            <div className="flex items-start gap-3">
-                              <div
-                                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: _colors.surface.elevated }}
-                              >
-                                {plugin.plugin.manifest.icon ? (
-                                  <div className={plugin.plugin.manifest.icon} />
-                                ) : (
-                                  <div className="i-ph:puzzle-piece text-lg" style={{ color: _colors.primary }} />
-                                )}
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className="font-medium text-sm truncate" style={{ color: _colors.text.primary }}>
-                                    {plugin.plugin.manifest.name}
-                                  </div>
-                                  <div
-                                    className={classNames(
-                                      getPluginStatusIcon(plugin.status),
-                                      'text-sm flex-shrink-0',
-                                      plugin.status === 'loading' ? 'animate-spin' : '',
-                                    )}
-                                    style={{ color: getPluginStatusColor(plugin.status) }}
-                                  />
-                                </div>
-
-                                <div className="text-xs truncate mb-1" style={{ color: _colors.text.secondary }}>
-                                  {plugin.plugin.manifest.description}
-                                </div>
-
-                                <div className="flex items-center gap-2 text-xs">
-                                  <span
-                                    className="px-2 py-0.5 rounded text-xs"
-                                    style={{
-                                      backgroundColor: `${_colors.primary}20`,
-                                      color: _colors.primary,
-                                    }}
-                                  >
-                                    {plugin.plugin.manifest.type}
-                                  </span>
-                                  <span style={{ color: _colors.text.tertiary }}>
-                                    v{plugin.plugin.manifest.version}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
+                            {category.label}
                           </button>
-                        </SmoothTransition>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="flex-1 flex flex-col">
-                {selectedPlugin ? (
-                  <SmoothTransition
-                    config={{
-                      type: 'fade',
-                      duration: 'normal',
-                      triggerOnMount: true,
-                    }}
-                  >
-                    {/* Plugin Details Header */}
-                    <div className="p-6 border-b" style={{ borderColor: _colors.border.primary }}>
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="w-16 h-16 rounded-xl flex items-center justify-center"
-                          style={{ backgroundColor: _colors.surface.elevated }}
-                        >
-                          {selectedPlugin.plugin.manifest.icon ? (
-                            <div className={classNames(selectedPlugin.plugin.manifest.icon, 'text-2xl')} />
-                          ) : (
-                            <div className="i-ph:puzzle-piece text-2xl" style={{ color: _colors.primary }} />
-                          )}
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h2 className="text-xl font-semibold" style={{ color: _colors.text.primary }}>
-                              {selectedPlugin.plugin.manifest.name}
-                            </h2>
-                            <div
-                              className={classNames(
-                                getPluginStatusIcon(selectedPlugin.status),
-                                'text-lg',
-                                selectedPlugin.status === 'loading' ? 'animate-spin' : '',
-                              )}
-                              style={{ color: getPluginStatusColor(selectedPlugin.status) }}
-                            />
-                          </div>
-
-                          <p className="text-sm mb-3" style={{ color: _colors.text.secondary }}>
-                            {selectedPlugin.plugin.manifest.description}
-                          </p>
-
-                          <div className="flex items-center gap-4 text-sm">
-                            <span style={{ color: _colors.text.secondary }}>
-                              الإصدار: <strong>{selectedPlugin.plugin.manifest.version}</strong>
-                            </span>
-                            <span style={{ color: _colors.text.secondary }}>
-                              المطور: <strong>{selectedPlugin.plugin.manifest.author}</strong>
-                            </span>
-                            <span style={{ color: _colors.text.secondary }}>
-                              الاستخدام: <strong>{selectedPlugin.usageCount}</strong>
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {/* Toggle Switch */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm" style={{ color: _colors.text.secondary }}>
-                              {selectedPlugin.status === 'active' ? 'نشط' : 'غير نشط'}
-                            </span>
-                            <Switch.Root
-                              checked={selectedPlugin.status === 'active'}
-                              onCheckedChange={() => togglePlugin(selectedPlugin.context.id, selectedPlugin.status)}
-                              disabled={isLoading || selectedPlugin.status === 'loading'}
-                              className={classNames(
-                                'relative inline-flex h-6 w-11 items-center rounded-full transition-_colors',
-                                selectedPlugin.status === 'active' ? '' : '',
-                                isLoading || selectedPlugin.status === 'loading' ? 'opacity-50' : '',
-                              )}
-                              style={{
-                                backgroundColor:
-                                  selectedPlugin.status === 'active'
-                                    ? _colors.status.success
-                                    : _colors.surface.elevated,
-                              }}
-                            >
-                              <Switch.Thumb
-                                className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                                style={{
-                                  transform:
-                                    selectedPlugin.status === 'active' ? 'translateX(24px)' : 'translateX(4px)',
-                                }}
-                              />
-                            </Switch.Root>
-                          </div>
-
-                          {/* Uninstall Button */}
-                          <button
-                            onClick={() => uninstallPlugin(selectedPlugin.context.id)}
-                            disabled={isLoading}
-                            className="px-3 py-1.5 text-sm rounded-lg border transition-_colors hover:scale-105 disabled:opacity-50"
-                            style={{
-                              backgroundColor: _colors.surface.elevated,
-                              borderColor: _colors.status.error,
-                              color: _colors.status.error,
-                            }}
-                          >
-                            إلغاء التثبيت
-                          </button>
-                        </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Plugin Details Content */}
-                    <div className="flex-1 overflow-auto p-6">
-                      <Tabs.Root defaultValue="info" className="h-full">
-                        <Tabs.List className="flex border-b mb-6" style={{ borderColor: _colors.border.primary }}>
-                          {[
-                            { id: 'info', name: 'المعلومات', icon: 'i-ph:info-duotone' },
-                            { id: 'config', name: 'الإعدادات', icon: 'i-ph:gear-duotone' },
-                            { id: 'permissions', name: 'الصلاحيات', icon: 'i-ph:shield-duotone' },
-                            { id: 'stats', name: 'الإحصائيات', icon: 'i-ph:chart-bar-duotone' },
-                          ].map((tab) => (
-                            <Tabs.Trigger
-                              key={tab.id}
-                              value={tab.id}
-                              className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-_colors border-b-2 border-transparent data-[state=active]:border-current"
-                              style={{ color: _colors.text.secondary }}
-                            >
-                              <div className={classNames(tab.icon, 'text-lg')} />
-                              {tab.name}
-                            </Tabs.Trigger>
-                          ))}
-                        </Tabs.List>
-
-                        {/* Info Tab */}
-                        <Tabs.Content value="info" className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <h3 className="font-medium mb-2" style={{ color: _colors.text.primary }}>
-                                معلومات أساسية
-                              </h3>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                  <span style={{ color: _colors.text.secondary }}>المعرف:</span>
-                                  <span style={{ color: _colors.text.primary }}>{selectedPlugin.context.id}</span>
+                    {/* Plugins Grid */}
+                    {filteredPlugins.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="text-4xl mb-4">📦</div>
+                        <div className="text-gray-500">
+                          {searchQuery || selectedCategory !== 'all' 
+                            ? 'لا توجد إضافات تطابق البحث'
+                            : 'لا توجد إضافات مثبتة'
+                          }
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredPlugins.map((plugin, pluginIndex) => (
+                          <div
+                            key={plugin.plugin.manifest.id}
+                            className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => setSelectedPlugin(plugin)}
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                  <span className="text-lg">🔌</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span style={{ color: _colors.text.secondary }}>النوع:</span>
-                                  <span style={{ color: _colors.text.primary }}>
-                                    {selectedPlugin.plugin.manifest.type}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span style={{ color: _colors.text.secondary }}>تاريخ التثبيت:</span>
-                                  <span style={{ color: _colors.text.primary }}>
-                                    {selectedPlugin.installDate.toLocaleDateString('ar-SA')}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span style={{ color: _colors.text.secondary }}>آخر استخدام:</span>
-                                  <span style={{ color: _colors.text.primary }}>
-                                    {selectedPlugin.lastUsed.toLocaleDateString('ar-SA')}
-                                  </span>
+                                <div>
+                                  <h3 className="font-semibold text-gray-900">
+                                    {plugin.plugin.manifest.name}
+                                  </h3>
+                                  <div className="text-xs text-gray-500">
+                                    v{plugin.plugin.manifest.version}
+                                  </div>
                                 </div>
                               </div>
+                              
+                              <div className={classNames(
+                                'w-3 h-3 rounded-full',
+                                plugin.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
+                              )} />
                             </div>
-
-                            <div>
-                              <h3 className="font-medium mb-2" style={{ color: _colors.text.primary }}>
-                                روابط
-                              </h3>
-                              <div className="space-y-2 text-sm">
-                                {selectedPlugin.plugin.manifest.homepage && (
-                                  <a
-                                    href={selectedPlugin.plugin.manifest.homepage}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 hover:underline"
-                                    style={{ color: _colors.primary }}
-                                  >
-                                    <div className="i-ph:house-duotone" />
-                                    الصفحة الرئيسية
-                                  </a>
+                            
+                            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                              {plugin.plugin.manifest.description}
+                            </p>
+                            
+                            <div className="flex items-center justify-between">
+                              <span className={classNames(
+                                'px-2 py-1 text-xs rounded-lg font-medium',
+                                plugin.status === 'active' 
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-gray-100 text-gray-600'
+                              )}>
+                                {plugin.status === 'active' ? 'مفعلة' : 'معطلة'}
+                              </span>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTogglePlugin(plugin.plugin.manifest.id, plugin.status !== 'active');
+                                }}
+                                className={classNames(
+                                  'px-3 py-1 text-xs rounded-lg transition-colors',
+                                  plugin.status === 'active'
+                                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
                                 )}
-                                {selectedPlugin.plugin.manifest.repository && (
-                                  <a
-                                    href={selectedPlugin.plugin.manifest.repository}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 hover:underline"
-                                    style={{ color: _colors.primary }}
-                                  >
-                                    <div className="i-ph:github-logo-duotone" />
-                                    المستودع
-                                  </a>
-                                )}
-                              </div>
+                              >
+                                {plugin.status === 'active' ? 'تعطيل' : 'تفعيل'}
+                              </button>
                             </div>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
+                  {/* Plugin Details Sidebar */}
+                  {selectedPlugin && (
+                    <div className="w-80 border-l border-gray-200 bg-gray-50 p-4 overflow-y-auto">
+                      <div className="mb-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <span className="text-xl">🔌</span>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-900">
+                              {selectedPlugin.plugin.manifest.name}
+                            </h3>
+                            <div className="text-sm text-gray-500">
+                              v{selectedPlugin.plugin.manifest.version}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-4">
+                          {selectedPlugin.plugin.manifest.description}
+                        </p>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <div className="text-xs font-medium text-gray-500 mb-1">المطور</div>
+                            <div className="text-sm text-gray-900">{selectedPlugin.plugin.manifest.author}</div>
+                          </div>
+                          
+                          <div>
+                            <div className="text-xs font-medium text-gray-500 mb-1">النوع</div>
+                            <div className="text-sm text-gray-900">{selectedPlugin.plugin.manifest.type}</div>
+                          </div>
+                          
                           {selectedPlugin.plugin.manifest.keywords && (
                             <div>
-                              <h3 className="font-medium mb-2" style={{ color: _colors.text.primary }}>
-                                الكلمات المفتاحية
-                              </h3>
-                              <div className="flex flex-wrap gap-2">
-                                {selectedPlugin.plugin.manifest.keywords.map((keyword, _index) => (
+                              <div className="text-xs font-medium text-gray-500 mb-2">الكلمات المفتاحية</div>
+                              <div className="flex flex-wrap gap-1">
+                                {selectedPlugin.plugin.manifest.keywords.map((keyword, keywordIndex) => (
                                   <span
-                                    key={index}
-                                    className="px-2 py-1 rounded text-xs"
-                                    style={{
-                                      backgroundColor: `${_colors.primary}20`,
-                                      color: _colors.primary,
-                                    }}
+                                    key={keywordIndex}
+                                    className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded"
                                   >
                                     {keyword}
                                   </span>
@@ -567,118 +342,155 @@ export function PluginManager({ isOpen, onClose }: PluginManagerProps) {
                               </div>
                             </div>
                           )}
-                        </Tabs.Content>
-
-                        {/* Config Tab */}
-                        <Tabs.Content value="config" className="space-y-4">
-                          <div
-                            className="p-4 rounded-lg border text-center"
-                            style={{
-                              backgroundColor: _colors.surface.elevated,
-                              borderColor: _colors.border.primary,
-                            }}
-                          >
-                            <div className="i-ph:gear-duotone text-4xl mb-2" style={{ color: _colors.primary }} />
-                            <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                              إعدادات الإضافة قيد التطوير
-                            </div>
-                          </div>
-                        </Tabs.Content>
-
-                        {/* Permissions Tab */}
-                        <Tabs.Content value="permissions" className="space-y-4">
-                          <div>
-                            <h3 className="font-medium mb-3" style={{ color: _colors.text.primary }}>
-                              الصلاحيات المطلوبة
-                            </h3>
-                            <div className="space-y-2">
-                              {selectedPlugin.plugin.manifest.permissions.map((permission, _index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-3 p-2 rounded border"
-                                  style={{
-                                    backgroundColor: _colors.surface.elevated,
-                                    borderColor: _colors.border.primary,
-                                  }}
-                                >
+                          
+                          {selectedPlugin.plugin.manifest.permissions && (
+                            <div>
+                              <div className="text-xs font-medium text-gray-500 mb-2">الصلاحيات</div>
+                              <div className="space-y-1">
+                                {selectedPlugin.plugin.manifest.permissions.map((permission, permissionIndex) => (
                                   <div
-                                    className="i-ph:shield-check-duotone text-lg"
-                                    style={{ color: _colors.status.success }}
-                                  />
-                                  <span className="text-sm" style={{ color: _colors.text.primary }}>
+                                    key={permissionIndex}
+                                    className="text-xs text-gray-600 flex items-center gap-2"
+                                  >
+                                    <span className="w-1 h-1 bg-gray-400 rounded-full" />
                                     {permission}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </Tabs.Content>
-
-                        {/* Stats Tab */}
-                        <Tabs.Content value="stats" className="space-y-4">
-                          <div className="grid grid-cols-3 gap-4">
-                            <div
-                              className="p-4 rounded-lg border text-center"
-                              style={{
-                                backgroundColor: _colors.surface.elevated,
-                                borderColor: _colors.border.primary,
-                              }}
-                            >
-                              <div className="text-2xl font-bold mb-1" style={{ color: _colors.text.primary }}>
-                                {selectedPlugin.usageCount}
-                              </div>
-                              <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                                مرات الاستخدام
+                                  </div>
+                                ))}
                               </div>
                             </div>
-
-                            <div
-                              className="p-4 rounded-lg border text-center"
-                              style={{
-                                backgroundColor: _colors.surface.elevated,
-                                borderColor: _colors.border.primary,
-                              }}
-                            >
-                              <div className="text-2xl font-bold mb-1" style={{ color: _colors.text.primary }}>
-                                {Math.floor(
-                                  (Date.now() - selectedPlugin.installDate.getTime()) / (1000 * 60 * 60 * 24),
-                                )}
-                              </div>
-                              <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                                أيام منذ التثبيت
-                              </div>
-                            </div>
-
-                            <div
-                              className="p-4 rounded-lg border text-center"
-                              style={{
-                                backgroundColor: _colors.surface.elevated,
-                                borderColor: _colors.border.primary,
-                              }}
-                            >
-                              <div className="text-2xl font-bold mb-1" style={{ color: _colors.text.primary }}>
-                                {selectedPlugin.status === 'active' ? '✓' : '✗'}
-                              </div>
-                              <div className="text-sm" style={{ color: _colors.text.secondary }}>
-                                الحالة الحالية
-                              </div>
-                            </div>
-                          </div>
-                        </Tabs.Content>
-                      </Tabs.Root>
+                          )}
+                        </div>
+                        
+                        <div className="mt-6 space-y-2">
+                          <button
+                            onClick={() => handleTogglePlugin(selectedPlugin.plugin.manifest.id, selectedPlugin.status !== 'active')}
+                            className={classNames(
+                              'w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+                              selectedPlugin.status === 'active'
+                                ? 'bg-red-500 text-white hover:bg-red-600'
+                                : 'bg-green-500 text-white hover:bg-green-600'
+                            )}
+                          >
+                            {selectedPlugin.status === 'active' ? 'تعطيل الإضافة' : 'تفعيل الإضافة'}
+                          </button>
+                          
+                          <button
+                            onClick={() => handleUninstallPlugin(selectedPlugin.plugin.manifest.id)}
+                            className="w-full px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                          >
+                            إلغاء التثبيت
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </SmoothTransition>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="i-ph:cursor-click text-6xl mb-4" style={{ color: _colors.text.secondary }} />
-                      <AnimatedText text="اختر إضافة لعرض تفاصيلها" className="text-lg" animationType="fade-in-words" />
+                  )}
+                </Tabs.Content>
+
+                {/* Available Plugins Tab */}
+                <Tabs.Content value="available" className="h-full p-4 overflow-y-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {availablePlugins.map((plugin, pluginIndex) => (
+                      <div key={plugin.id} className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <span className="text-lg">{plugin.icon}</span>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-gray-900">{plugin.name}</h3>
+                              <div className="text-xs text-gray-500">v{plugin.version}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <span>⭐</span>
+                            <span>{plugin.rating}</span>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {plugin.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-xs text-gray-500">
+                            {plugin.downloads.toLocaleString()} تحميل
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {plugin.author}
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {plugin.tags.slice(0, 3).map((tag: string, tagIndex: number) => (
+                            <span key={tagIndex} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        <button
+                          onClick={() => handleInstallPlugin(plugin.id)}
+                          className="w-full px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          تثبيت
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Tabs.Content>
+
+                {/* Settings Tab */}
+                <Tabs.Content value="settings" className="h-full p-4 overflow-y-auto">
+                  <div className="max-w-2xl">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">إعدادات الإضافات</h3>
+                    
+                    <div className="space-y-6">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium text-gray-900 mb-2">التحديث التلقائي</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          تحديث الإضافات تلقائياً عند توفر إصدارات جديدة
+                        </p>
+                        <label className="flex items-center gap-3">
+                          <input type="checkbox" className="w-4 h-4 text-purple-500 rounded" defaultChecked />
+                          <span className="text-sm text-gray-700">تفعيل التحديث التلقائي</span>
+                        </label>
+                      </div>
+                      
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium text-gray-900 mb-2">الإشعارات</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          إشعارات حول الإضافات الجديدة والتحديثات
+                        </p>
+                        <label className="flex items-center gap-3">
+                          <input type="checkbox" className="w-4 h-4 text-purple-500 rounded" defaultChecked />
+                          <span className="text-sm text-gray-700">إشعارات الإضافات</span>
+                        </label>
+                      </div>
+                      
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium text-gray-900 mb-2">مجلد الإضافات</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          مسار تثبيت الإضافات المحلية
+                        </p>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value="~/.bolt/plugins" 
+                            readOnly
+                            className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded text-sm"
+                          />
+                          <button className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
+                            تغيير
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
+                </Tabs.Content>
               </div>
-            </div>
-          </SmoothTransition>
+            </Tabs.Root>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

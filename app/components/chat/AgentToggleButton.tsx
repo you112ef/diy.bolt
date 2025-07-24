@@ -1,68 +1,82 @@
-import { useStore } from '@nanostores/react';
+import React, { useState } from 'react';
 import { classNames } from '~/utils/classNames';
-
-// import isModelInAgentMode from '~/lib/stores/agent-mode';
-import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface AgentToggleButtonProps {
   modelName: string;
   providerName: string;
   className?: string;
+  onToggle?: (enabled: boolean) => void;
 }
 
-export function AgentToggleButton({ modelName, providerName, className }: AgentToggleButtonProps) {
-  const _agentModels = useStore(agentModelsStore);
-  const isAgent = isModelInAgentMode(modelName, providerName);
-  const agent = getAgentByModel(modelName, providerName);
+export function AgentToggleButton({ modelName, providerName, className, onToggle }: AgentToggleButtonProps) {
+  const [isAgentMode, setIsAgentMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleToggle = () => {
-    toggleAgentMode(modelName, providerName);
+  // Simple agent mode check - in real implementation this would check actual capabilities
+  const isAgent = modelName.toLowerCase().includes('gpt') || 
+                   modelName.toLowerCase().includes('claude') || 
+                   modelName.toLowerCase().includes('gemini');
+
+  const handleToggle = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const newState = !isAgentMode;
+      setIsAgentMode(newState);
+      onToggle?.(newState);
+      
+      // Simulate toggle delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) {
+      console.error('Error toggling agent mode:', error);
+      setIsAgentMode(!isAgentMode); // Revert on error
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  if (!isAgent) {
+    return (
+      <div className={classNames(
+        "flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs",
+        className
+      )}>
+        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
+        <span>وضع الوكيل غير متاح</span>
+      </div>
+    );
+  }
+
   return (
-    <Tooltip.Provider>
-      <Tooltip.Root>
-        <Tooltip.Trigger asChild>
-          <button
-            onClick={handleToggle}
-            className={classNames(
-              'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200',
-              'hover:scale-105 active:scale-95',
-              isAgent
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                : 'bg-bolt-elements-background-depth-2 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary border border-bolt-elements-borderColor hover:border-bolt-elements-borderColorHover',
-              className,
-            )}
-            type="button"
-            aria-label={isAgent ? 'Disable agent mode' : 'Enable agent mode'}
-          >
-            {isAgent ? (
-              <div className="i-ph:robot-duotone text-lg" />
-            ) : (
-              <div className="i-ph:user-circle-duotone text-lg" />
-            )}
-          </button>
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
-            className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded-md text-sm shadow-lg border border-bolt-elements-borderColor"
-            sideOffset={5}
-          >
-            {isAgent ? (
-              <div>
-                <div className="font-medium text-blue-400">{agent?.agentName}</div>
-                <div className="text-xs text-bolt-elements-textSecondary">Click to disable agent mode</div>
-              </div>
-            ) : (
-              <div>
-                <div className="font-medium">Standard Model</div>
-                <div className="text-xs text-bolt-elements-textSecondary">Click to enable agent mode</div>
-              </div>
-            )}
-            <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
+    <button
+      onClick={handleToggle}
+      disabled={isLoading}
+      className={classNames(
+        'flex items-center gap-2 px-2 py-1 rounded text-xs font-medium transition-all',
+        'hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
+        isAgentMode
+          ? 'bg-blue-500 text-white shadow-sm'
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+        className
+      )}
+    >
+      <div className={classNames(
+        'w-1.5 h-1.5 rounded-full transition-colors',
+        isLoading ? 'animate-pulse' : '',
+        isAgentMode ? 'bg-white' : 'bg-gray-400'
+      )}></div>
+      
+      <span>
+        {isLoading ? 'جاري...' : isAgentMode ? 'وكيل نشط' : 'تفعيل وكيل'}
+      </span>
+      
+      {isAgentMode && (
+        <div className="text-xs bg-white/20 px-1 py-0.5 rounded">
+          🤖
+        </div>
+      )}
+    </button>
   );
 }

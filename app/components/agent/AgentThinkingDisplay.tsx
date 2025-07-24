@@ -100,9 +100,9 @@ export function AgentThinkingDisplay({ agentResponse, isProcessing }: AgentThink
                   
                   <Collapsible.Content className="overflow-hidden data-[state=closed]:animate-collapse-up data-[state=open]:animate-collapse-down">
                     <div className="p-3 mt-1 bg-white rounded-lg border border-gray-200 text-sm text-gray-600">
-                      <pre className="whitespace-pre-wrap font-mono text-xs">
-                        {step.content || JSON.stringify(step, null, 2)}
-                      </pre>
+                                             <pre className="whitespace-pre-wrap font-mono text-xs">
+                         {step.reasoning || step.thought || JSON.stringify(step, null, 2)}
+                       </pre>
                     </div>
                   </Collapsible.Content>
                 </Collapsible.Root>
@@ -117,14 +117,14 @@ export function AgentThinkingDisplay({ agentResponse, isProcessing }: AgentThink
                 الأدوات المستخدمة ({agentResponse.toolsUsed.length}):
               </h4>
               <div className="flex flex-wrap gap-2">
-                {agentResponse.toolsUsed.map((tool, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg font-medium"
-                  >
-                    {tool}
-                  </span>
-                ))}
+                                 {agentResponse.toolsUsed.map((tool, index) => (
+                   <span
+                     key={index}
+                     className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg font-medium"
+                   >
+                     {tool.toolName || JSON.stringify(tool)}
+                   </span>
+                 ))}
               </div>
             </div>
           )}
@@ -136,26 +136,26 @@ export function AgentThinkingDisplay({ agentResponse, isProcessing }: AgentThink
                 نتائج البحث ({agentResponse.searchResults.length}):
               </h4>
               <div className="space-y-2">
-                {agentResponse.searchResults.map((result, index) => (
-                  <div key={index} className="p-2 bg-gray-50 rounded border text-xs">
-                    <div className="font-medium text-gray-700 mb-1">
-                      {result.title || `نتيجة ${index + 1}`}
-                    </div>
-                    <div className="text-gray-600">
-                      {result.content ? result.content.substring(0, 150) + '...' : 'لا يوجد محتوى'}
-                    </div>
-                    {result.url && (
-                      <a 
-                        href={result.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 underline"
-                      >
-                        {result.url}
-                      </a>
-                    )}
-                  </div>
-                ))}
+                                 {agentResponse.searchResults.map((searchResult, index) => (
+                   <div key={index} className="p-2 bg-gray-50 rounded border text-xs">
+                     <div className="font-medium text-gray-700 mb-1">
+                       البحث عن: {searchResult.query}
+                     </div>
+                     <div className="space-y-1">
+                       {searchResult.results.slice(0, 2).map((result, resultIndex) => (
+                         <div key={resultIndex} className="p-2 bg-white rounded text-xs">
+                           <div className="font-medium text-gray-700">{result.title}</div>
+                           <div className="text-gray-600">
+                             {result._content ? result._content.substring(0, 150) + '...' : 'لا يوجد محتوى'}
+                           </div>
+                           <div className="text-gray-500 text-xs mt-1">
+                             المصدر: {result.source} | الصلة: {Math.round(result.relevance * 100)}%
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 ))}
               </div>
             </div>
           )}

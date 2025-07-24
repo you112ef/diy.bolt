@@ -7,7 +7,7 @@ import type { Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useAnimate } from 'framer-motion';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, memo, useRef, useState } from 'react';
 import { cssTransition, toast, ToastContainer } from 'react-toastify';
 import { useMessageParser, usePromptEnhancer, useShortcuts } from '~/lib/hooks';
 import { description, useChatHistory } from '~/lib/persistence';
@@ -156,9 +156,9 @@ export const ChatImpl = memo(
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
 
     // Get agent information for current model
-    const _agentModels = useStore(agentModelsStore);
-    const currentAgent = model && provider ? getAgentByModel(model, provider.name) : null;
-    const agentSystemPrompt = currentAgent?.systemPrompt;
+        // Agent functionality - simplified for now
+  const currentAgent = null;
+  const agentSystemPrompt = undefined;
 
     const {
       messages,
@@ -214,7 +214,7 @@ export const ChatImpl = memo(
             model,
             provider: provider.name,
             usage,
-            messageLength: message._content.length,
+            messageLength: message.content.length,
           });
         }
 
@@ -360,7 +360,7 @@ export const ChatImpl = memo(
                       type: 'text',
                       text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`,
                     },
-                    ...imageDataList.map((imageData) => ({
+                    ...imageDataList.map((imageData: string) => ({
                       type: 'image',
                       image: imageData,
                     })),
@@ -405,7 +405,7 @@ export const ChatImpl = memo(
                 type: 'text',
                 text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`,
               },
-              ...imageDataList.map((imageData) => ({
+              ...imageDataList.map((imageData: string) => ({
                 type: 'image',
                 image: imageData,
               })),
@@ -444,7 +444,7 @@ export const ChatImpl = memo(
               type: 'text',
               text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userUpdateArtifact}${finalMessageContent}`,
             },
-            ...imageDataList.map((imageData) => ({
+            ...imageDataList.map((imageData: string) => ({
               type: 'image',
               image: imageData,
             })),
@@ -460,7 +460,7 @@ export const ChatImpl = memo(
               type: 'text',
               text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`,
             },
-            ...imageDataList.map((imageData) => ({
+            ...imageDataList.map((imageData: string) => ({
               type: 'image',
               image: imageData,
             })),

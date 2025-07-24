@@ -556,7 +556,7 @@ export class AdvancedAIAgent {
   }
 
   getAvailableTools(): string[] {
-    return Array.from(this.availableTools._keys());
+    return Array.from(this.availableTools.keys());
   }
 }
 
