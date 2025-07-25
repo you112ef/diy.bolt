@@ -27,6 +27,7 @@ import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
+import { routeAgentRequest } from '~/lib/agentRouter';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -309,6 +310,58 @@ export const ChatImpl = memo(
 
       if (isLoading) {
         abort();
+        return;
+      }
+
+      // If Agent Mod is enabled, route through agentRouter
+      if (isAgentMode) {
+        try {
+          // Construct AgentContext
+          const agentContext = {
+            messages: [
+              ...messages,
+              {
+                id: `${Date.now()}`,
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: `[Model: ${model}][Provider: ${provider.name}]\n\n${messageContent}`,
+                  },
+                  ...imageDataList.map((imageData) => ({
+                    type: 'image',
+                    image: imageData,
+                  })),
+                ],
+              },
+            ],
+            files: workbenchStore.getModifiedFiles?.() || undefined,
+            apiKeys: {}, // يمكنك تمرير مفاتيح API إذا لزم الأمر
+            providerSettings: provider.settings ? { [provider.name]: provider.settings } : {},
+            contextOptimization: contextOptimizationEnabled,
+          };
+          setInput('');
+          Cookies.remove(PROMPT_COOKIE_KEY);
+          setUploadedFiles([]);
+          setImageDataList([]);
+          resetEnhancer();
+          textareaRef.current?.blur();
+          setFakeLoading(true);
+          const agentResponse = await routeAgentRequest(agentContext);
+          setFakeLoading(false);
+          append({
+            role: 'assistant',
+            content: [
+              {
+                type: 'text',
+                text: agentResponse,
+              },
+            ],
+          });
+        } catch (err) {
+          setFakeLoading(false);
+          toast.error('حدث خطأ أثناء معالجة Agent Mod');
+        }
         return;
       }
 
