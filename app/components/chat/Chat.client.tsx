@@ -28,6 +28,7 @@ import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { routeAgentRequest } from '~/lib/agentRouter';
+import type { IProviderConfig } from '~/types/model';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -117,7 +118,7 @@ interface ChatProps {
 export const ChatImpl = memo(
   ({ description, initialMessages, storeMessageHistory, importChat, exportChat }: ChatProps) => {
     useShortcuts();
-    
+
     const { isAgentMode, toggleAgentMode } = useAgentMode();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [chatStarted, setChatStarted] = useState(initialMessages.length > 0);
@@ -317,27 +318,22 @@ export const ChatImpl = memo(
       if (isAgentMode) {
         try {
           // Construct AgentContext
+          const userText = `[Model: ${model}][Provider: ${provider.name}]
+
+${messageContent}`;
+          const imagesText = imageDataList.length > 0 ? `\n\n[Images attached: ${imageDataList.length}]` : '';
           const agentContext = {
             messages: [
               ...messages,
               {
                 id: `${Date.now()}`,
-                role: 'user',
-                content: [
-                  {
-                    type: 'text',
-                    text: `[Model: ${model}][Provider: ${provider.name}]\n\n${messageContent}`,
-                  },
-                  ...imageDataList.map((imageData) => ({
-                    type: 'image',
-                    image: imageData,
-                  })),
-                ],
+                role: 'user' as const,
+                content: userText + imagesText,
               },
             ],
             files: workbenchStore.getModifiedFiles?.() || undefined,
             apiKeys: {}, // يمكنك تمرير مفاتيح API إذا لزم الأمر
-            providerSettings: provider.settings ? { [provider.name]: provider.settings } : {},
+            providerSettings: 'settings' in provider && provider.settings ? { [provider.name]: provider.settings } : {},
             contextOptimization: contextOptimizationEnabled,
           };
           setInput('');
@@ -347,16 +343,12 @@ export const ChatImpl = memo(
           resetEnhancer();
           textareaRef.current?.blur();
           setFakeLoading(true);
+
           const agentResponse = await routeAgentRequest(agentContext);
           setFakeLoading(false);
           append({
             role: 'assistant',
-            content: [
-              {
-                type: 'text',
-                text: agentResponse,
-              },
-            ],
+            content: agentResponse,
           });
         } catch (err) {
           setFakeLoading(false);

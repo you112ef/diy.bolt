@@ -23,11 +23,7 @@ interface ToolsGalleryProps {
   showSearch?: boolean;
 }
 
-export function ToolsGallery({ 
-  onToolSelect, 
-  selectedCategory = 'all',
-  showSearch = true 
-}: ToolsGalleryProps) {
+export function ToolsGallery({ onToolSelect, selectedCategory = 'all', showSearch = true }: ToolsGalleryProps) {
   const { isAgentMode } = useAgentMode();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState(selectedCategory);
@@ -45,7 +41,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['إكمال تلقائي', 'اكتشاف الأخطاء', 'تنسيق الكود', 'دعم multi-language'],
-      usage: { sessions: 147, successRate: 96 }
+      usage: { sessions: 147, successRate: 96 },
     },
     {
       id: 'terminal',
@@ -56,7 +52,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['تشغيل متعدد الجلسات', 'اقتراحات ذكية', 'سجل الأوامر', 'تكامل مع Git'],
-      usage: { sessions: 89, successRate: 94 }
+      usage: { sessions: 89, successRate: 94 },
     },
     {
       id: 'file-explorer',
@@ -67,7 +63,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['بحث ذكي', 'معاينة الملفات', 'تنظيم تلقائي', 'مزامنة سحابية'],
-      usage: { sessions: 203, successRate: 98 }
+      usage: { sessions: 203, successRate: 98 },
     },
     {
       id: 'git-manager',
@@ -78,7 +74,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['مراجعة مرئية', 'اقتراح commit messages', 'حل التعارضات', 'تتبع التغييرات'],
-      usage: { sessions: 76, successRate: 92 }
+      usage: { sessions: 76, successRate: 92 },
     },
 
     // أدوات التحليل
@@ -91,7 +87,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['تحليل الأداء', 'فحص الأمان', 'اكتشاف الأنماط', 'تقارير مفصلة'],
-      usage: { sessions: 52, successRate: 89 }
+      usage: { sessions: 52, successRate: 89 },
     },
     {
       id: 'dependency-tracker',
@@ -102,7 +98,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['فحص الثغرات', 'تحديثات تلقائية', 'تحليل الحجم', 'توافق الإصدارات'],
-      usage: { sessions: 31, successRate: 95 }
+      usage: { sessions: 31, successRate: 95 },
     },
     {
       id: 'performance-monitor',
@@ -113,7 +109,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['مراقبة الذاكرة', 'تحليل الشبكة', 'قياس السرعة', 'تنبيهات ذكية'],
-      usage: { sessions: 44, successRate: 91 }
+      usage: { sessions: 44, successRate: 91 },
     },
 
     // أدوات النشر
@@ -126,7 +122,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['نشر متعدد المنصات', 'تحسين التكلفة', 'مراقبة الحالة', 'rollback تلقائي'],
-      usage: { sessions: 23, successRate: 87 }
+      usage: { sessions: 23, successRate: 87 },
     },
     {
       id: 'docker-manager',
@@ -137,7 +133,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['بناء تلقائي', 'تحسين الحجم', 'مراقبة الموارد', 'أمان الحاويات'],
-      usage: { sessions: 67, successRate: 93 }
+      usage: { sessions: 67, successRate: 93 },
     },
     {
       id: 'ci-cd-pipeline',
@@ -148,7 +144,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['اختبارات تلقائية', 'نشر تدريجي', 'تنبيهات الفشل', 'تقارير الجودة'],
-      usage: { sessions: 38, successRate: 88 }
+      usage: { sessions: 38, successRate: 88 },
     },
 
     // أدوات الذكاء الاصطناعي
@@ -161,7 +157,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['فهم اللغة الطبيعية', 'أفضل الممارسات', 'توثيق تلقائي', 'تحسين الأداء'],
-      usage: { sessions: 124, successRate: 94 }
+      usage: { sessions: 124, successRate: 94 },
     },
     {
       id: 'ai-debugger',
@@ -172,7 +168,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['اكتشاف ذكي', 'اقتراح حلول', 'تفسير الأخطاء', 'منع التكرار'],
-      usage: { sessions: 89, successRate: 91 }
+      usage: { sessions: 89, successRate: 91 },
     },
     {
       id: 'ai-architect',
@@ -183,7 +179,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['تصميم النمط', 'اقتراح التقنيات', 'تحليل التوافق', 'وثائق معمارية'],
-      usage: { sessions: 45, successRate: 96 }
+      usage: { sessions: 45, successRate: 96 },
     },
 
     // أدوات مساعدة
@@ -196,7 +192,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['توثيق تلقائي', 'أمثلة تفاعلية', 'بحث متقدم', 'تحديث ديناميكي'],
-      usage: { sessions: 62, successRate: 97 }
+      usage: { sessions: 62, successRate: 97 },
     },
     {
       id: 'api-tester',
@@ -207,7 +203,7 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['اختبارات تلقائية', 'مراقبة الاستجابة', 'توثيق تفاعلي', 'اختبار الحمولة'],
-      usage: { sessions: 73, successRate: 93 }
+      usage: { sessions: 73, successRate: 93 },
     },
     {
       id: 'security-scanner',
@@ -218,8 +214,8 @@ export function ToolsGallery({
       status: 'active',
       agentIntegrated: true,
       features: ['فحص الثغرات', 'تحليل التشفير', 'مراجعة الأذونات', 'تقارير أمنية'],
-      usage: { sessions: 34, successRate: 89 }
-    }
+      usage: { sessions: 34, successRate: 89 },
+    },
   ];
 
   const categories = [
@@ -228,14 +224,16 @@ export function ToolsGallery({
     { id: 'analysis', name: 'التحليل', icon: 'i-ph:chart-pie' },
     { id: 'deployment', name: 'النشر', icon: 'i-ph:rocket-launch' },
     { id: 'ai', name: 'الذكاء الاصطناعي', icon: 'i-ph:robot' },
-    { id: 'utility', name: 'أدوات مساعدة', icon: 'i-ph:wrench' }
+    { id: 'utility', name: 'أدوات مساعدة', icon: 'i-ph:wrench' },
   ];
 
   // تصفية الأدوات
-  const filteredTools = tools.filter(tool => {
+  const filteredTools = tools.filter((tool) => {
     const matchesCategory = activeCategory === 'all' || tool.category === activeCategory;
-    const matchesSearch = tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tool.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchTerm.toLowerCase());
+
     return matchesCategory && matchesSearch;
   });
 
@@ -262,9 +260,7 @@ export function ToolsGallery({
       {/* Header */}
       <div className="mb-8">
         <h2 className="enhanced-text title mb-2">معرض الأدوات المتكاملة</h2>
-        <p className="enhanced-text body mb-6">
-          مجموعة شاملة من الأدوات المطورة والمدمجة مع الذكاء الاصطناعي
-        </p>
+        <p className="enhanced-text body mb-6">مجموعة شاملة من الأدوات المطورة والمدمجة مع الذكاء الاصطناعي</p>
 
         {/* البحث */}
         {showSearch && (
@@ -290,7 +286,7 @@ export function ToolsGallery({
               onClick={() => setActiveCategory(category.id)}
               className={classNames(
                 'enhanced-button compact flex items-center gap-2',
-                activeCategory === category.id ? 'primary' : ''
+                activeCategory === category.id ? 'primary' : '',
               )}
             >
               <div className={category.icon} />
@@ -307,14 +303,12 @@ export function ToolsGallery({
           <div className="enhanced-text caption">أداة متاحة</div>
         </div>
         <div className="enhanced-card text-center py-4">
-          <div className="enhanced-text title text-green-400 mb-2">
-            {tools.filter(t => t.agentIntegrated).length}
-          </div>
+          <div className="enhanced-text title text-green-400 mb-2">{tools.filter((t) => t.agentIntegrated).length}</div>
           <div className="enhanced-text caption">مدمجة مع AI</div>
         </div>
         <div className="enhanced-card text-center py-4">
           <div className="enhanced-text title text-blue-400 mb-2">
-            {tools.filter(t => t.status === 'active').length}
+            {tools.filter((t) => t.status === 'active').length}
           </div>
           <div className="enhanced-text caption">نشطة حالياً</div>
         </div>
@@ -329,13 +323,10 @@ export function ToolsGallery({
         {filteredTools.map((tool) => (
           <div
             key={tool.id}
-            className={classNames(
-              'enhanced-card group cursor-pointer relative overflow-hidden',
-              {
-                'agent-active': tool.agentIntegrated && isAgentMode,
-                'ring-2 ring-purple-500/50': selectedTool?.id === tool.id,
-              }
-            )}
+            className={classNames('enhanced-card group cursor-pointer relative overflow-hidden', {
+              'agent-active': tool.agentIntegrated && isAgentMode,
+              'ring-2 ring-purple-500/50': selectedTool?.id === tool.id,
+            })}
             onClick={() => handleToolClick(tool)}
           >
             {/* شريط Agent */}
@@ -347,10 +338,7 @@ export function ToolsGallery({
               {/* الرأس */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={classNames(
-                    'enhanced-icon',
-                    tool.agentIntegrated ? 'agent-icon' : ''
-                  )}>
+                  <div className={classNames('enhanced-icon', tool.agentIntegrated ? 'agent-icon' : '')}>
                     <div className={classNames(tool.icon, 'text-xl')} />
                   </div>
                   <div>
@@ -358,22 +346,17 @@ export function ToolsGallery({
                     <div className="flex items-center gap-2">
                       {getStatusIcon(tool.status)}
                       <span className="enhanced-text caption">
-                        {tool.status === 'active' ? 'نشط' :
-                         tool.status === 'available' ? 'متاح' : 'قريباً'}
+                        {tool.status === 'active' ? 'نشط' : tool.status === 'available' ? 'متاح' : 'قريباً'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {tool.agentIntegrated && (
-                  <span className="enhanced-badge active">AI</span>
-                )}
+                {tool.agentIntegrated && <span className="enhanced-badge active">AI</span>}
               </div>
 
               {/* الوصف */}
-              <p className="enhanced-text body mb-4 opacity-80">
-                {tool.description}
-              </p>
+              <p className="enhanced-text body mb-4 opacity-80">{tool.description}</p>
 
               {/* المميزات */}
               <div className="mb-4">
@@ -399,15 +382,11 @@ export function ToolsGallery({
                 <div className="flex items-center justify-between pt-4 border-t border-enhanced-border-subtle">
                   <div className="text-center">
                     <div className="enhanced-text caption mb-1">جلسات</div>
-                    <div className="enhanced-text subtitle font-bold text-blue-400">
-                      {tool.usage.sessions}
-                    </div>
+                    <div className="enhanced-text subtitle font-bold text-blue-400">{tool.usage.sessions}</div>
                   </div>
                   <div className="text-center">
                     <div className="enhanced-text caption mb-1">نجاح</div>
-                    <div className="enhanced-text subtitle font-bold text-green-400">
-                      {tool.usage.successRate}%
-                    </div>
+                    <div className="enhanced-text subtitle font-bold text-green-400">{tool.usage.successRate}%</div>
                   </div>
                 </div>
               )}

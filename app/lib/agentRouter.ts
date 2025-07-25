@@ -1,6 +1,25 @@
 import type { Message } from 'ai';
 import type { IProviderSetting } from '~/types/model';
 
+export interface AgentContext {
+  messages: Message[];
+  files?: any;
+  apiKeys: Record<string, string>;
+  providerSettings: Record<string, IProviderSetting>;
+  contextOptimization?: boolean;
+}
+
+export interface AgentTools {
+  fileSearch: (query: string) => Promise<string[]>;
+  codeAnalysis: (code: string) => Promise<any>;
+  errorDiagnostics: (error: string) => Promise<any>;
+  webSearch: (query: string) => Promise<any>;
+  documentGeneration: (input: any) => Promise<string>;
+  gitOperations: (command: string) => Promise<any>;
+  terminalExecution: (command: string) => Promise<any>;
+  databaseQuery: (query: string) => Promise<any>;
+}
+
 export interface AgentAnalysis {
   intent: string;
   complexity: 'simple' | 'moderate' | 'complex';
@@ -67,52 +86,94 @@ export async function analyzeUserRequest(context: AgentContext): Promise<AgentAn
   const lastMessage = context.messages[context.messages.length - 1];
   const userInput = lastMessage?.content || '';
   const previousMessages = context.messages.slice(0, -1);
-  
+
   // تحليل النوايا المتقدم
   const intentPatterns = {
     code_generation: [
-      'create', 'build', 'develop', 'write', 'generate', 'code', 'function',
-      'component', 'class', 'module', 'app', 'website', 'api', 'script'
+      'create',
+      'build',
+      'develop',
+      'write',
+      'generate',
+      'code',
+      'function',
+      'component',
+      'class',
+      'module',
+      'app',
+      'website',
+      'api',
+      'script',
     ],
     debugging: [
-      'fix', 'error', 'bug', 'debug', 'issue', 'problem', 'broken', 'not working',
-      'crash', 'exception', 'syntax error', 'runtime error'
+      'fix',
+      'error',
+      'bug',
+      'debug',
+      'issue',
+      'problem',
+      'broken',
+      'not working',
+      'crash',
+      'exception',
+      'syntax error',
+      'runtime error',
     ],
     explanation: [
-      'explain', 'what', 'how', 'why', 'understand', 'help', 'clarify',
-      'definition', 'concept', 'principle', 'theory'
+      'explain',
+      'what',
+      'how',
+      'why',
+      'understand',
+      'help',
+      'clarify',
+      'definition',
+      'concept',
+      'principle',
+      'theory',
     ],
     optimization: [
-      'optimize', 'improve', 'performance', 'faster', 'better', 'efficient',
-      'refactor', 'enhance', 'upgrade'
+      'optimize',
+      'improve',
+      'performance',
+      'faster',
+      'better',
+      'efficient',
+      'refactor',
+      'enhance',
+      'upgrade',
     ],
-    integration: [
-      'integrate', 'connect', 'combine', 'merge', 'link', 'sync', 'api',
-      'database', 'service', 'platform'
-    ],
+    integration: ['integrate', 'connect', 'combine', 'merge', 'link', 'sync', 'api', 'database', 'service', 'platform'],
     deployment: [
-      'deploy', 'publish', 'launch', 'release', 'host', 'server', 'production',
-      'docker', 'kubernetes', 'aws', 'vercel', 'netlify'
+      'deploy',
+      'publish',
+      'launch',
+      'release',
+      'host',
+      'server',
+      'production',
+      'docker',
+      'kubernetes',
+      'aws',
+      'vercel',
+      'netlify',
     ],
-    analysis: [
-      'analyze', 'review', 'audit', 'examine', 'investigate', 'research',
-      'study', 'evaluate', 'assess'
-    ]
+    analysis: ['analyze', 'review', 'audit', 'examine', 'investigate', 'research', 'study', 'evaluate', 'assess'],
   };
 
   let intent = 'general';
   let confidence = 0;
   let complexity: 'simple' | 'moderate' | 'complex' = 'simple';
   let requiredActions: string[] = [];
-  let tools: string[] = [];
+  const tools: string[] = [];
 
   const lowerInput = userInput.toLowerCase();
-  
+
   // تحديد النية بناءً على التطابق مع الأنماط
   for (const [intentType, patterns] of Object.entries(intentPatterns)) {
-    const matches = patterns.filter(pattern => lowerInput.includes(pattern)).length;
+    const matches = patterns.filter((pattern) => lowerInput.includes(pattern)).length;
     const currentConfidence = matches / patterns.length;
-    
+
     if (currentConfidence > confidence) {
       intent = intentType;
       confidence = currentConfidence;
@@ -125,29 +186,63 @@ export async function analyzeUserRequest(context: AgentContext): Promise<AgentAn
     hasFiles: context.files && Object.keys(context.files).length > 0,
     hasErrors: /error|exception|failed|broken/.test(lowerInput),
     needsResearch: /latest|new|recent|current|trend/.test(lowerInput),
-    requiresMultiStep: userInput.length > 200 || lowerInput.includes('step') || lowerInput.includes('process')
+    requiresMultiStep: userInput.length > 200 || lowerInput.includes('step') || lowerInput.includes('process'),
   };
 
   // تحديد الأدوات المطلوبة
-  if (context_analysis.hasCode) tools.push('codeAnalysis');
-  if (context_analysis.hasFiles) tools.push('fileSearch');
-  if (context_analysis.hasErrors) tools.push('errorDiagnostics');
-  if (context_analysis.needsResearch) tools.push('webSearch');
-  if (intent === 'deployment') tools.push('gitOperations', 'terminalExecution');
-  if (intent === 'integration') tools.push('databaseQuery', 'webSearch');
+  if (context_analysis.hasCode) {
+    tools.push('codeAnalysis');
+  }
+
+  if (context_analysis.hasFiles) {
+    tools.push('fileSearch');
+  }
+
+  if (context_analysis.hasErrors) {
+    tools.push('errorDiagnostics');
+  }
+
+  if (context_analysis.needsResearch) {
+    tools.push('webSearch');
+  }
+
+  if (intent === 'deployment') {
+    tools.push('gitOperations', 'terminalExecution');
+  }
+
+  if (intent === 'integration') {
+    tools.push('databaseQuery', 'webSearch');
+  }
 
   // تحديد الإجراءات المطلوبة بناءً على النية
   switch (intent) {
     case 'code_generation':
-      requiredActions = ['analyze_requirements', 'design_architecture', 'generate_code', 'test_implementation', 'optimize_performance'];
+      requiredActions = [
+        'analyze_requirements',
+        'design_architecture',
+        'generate_code',
+        'test_implementation',
+        'optimize_performance',
+      ];
       complexity = context_analysis.requiresMultiStep ? 'complex' : 'moderate';
       break;
     case 'debugging':
-      requiredActions = ['analyze_error', 'identify_root_cause', 'develop_solution', 'implement_fix', 'verify_solution'];
+      requiredActions = [
+        'analyze_error',
+        'identify_root_cause',
+        'develop_solution',
+        'implement_fix',
+        'verify_solution',
+      ];
       complexity = context_analysis.hasFiles ? 'complex' : 'moderate';
       break;
     case 'optimization':
-      requiredActions = ['performance_analysis', 'identify_bottlenecks', 'implement_optimizations', 'benchmark_results'];
+      requiredActions = [
+        'performance_analysis',
+        'identify_bottlenecks',
+        'implement_optimizations',
+        'benchmark_results',
+      ];
       complexity = 'moderate';
       break;
     case 'integration':
@@ -173,9 +268,11 @@ export async function analyzeUserRequest(context: AgentContext): Promise<AgentAn
   }
 
   // تقدير التعقيد النهائي
-  if (userInput.length > 500 || 
-      (context.files && Object.keys(context.files).length > 10) ||
-      previousMessages.length > 5) {
+  if (
+    userInput.length > 500 ||
+    (context.files && Object.keys(context.files).length > 10) ||
+    previousMessages.length > 5
+  ) {
     complexity = 'complex';
   }
 
@@ -205,28 +302,31 @@ export async function createExecutionPlan(analysis: AgentAnalysis, context: Agen
   // إنشاء خطوات مفصلة بناءً على التحليل
   for (const action of analysis.requiredActions) {
     const stepConfig = getStepConfiguration(action, analysis);
-    
+
     steps.push({
       id: `step_${stepId.toString().padStart(2, '0')}`,
       description: stepConfig.description,
-      action: action,
+      action,
       priority: stepConfig.priority,
       tool: stepConfig.tool,
       dependencies: stepConfig.dependencies,
       estimatedTime: stepConfig.estimatedTime,
     });
-    
+
     stepId++;
   }
 
   // ترتيب الخطوات حسب الأولوية والتبعيات
   steps.sort((a, b) => {
-    if (a.priority !== b.priority) return a.priority - b.priority;
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+
     return a.dependencies.length - b.dependencies.length;
   });
 
   // تحديد إمكانية التنفيذ المتوازي
-  const parallelizable = steps.some(step => step.dependencies.length === 0) && steps.length > 2;
+  const parallelizable = steps.some((step) => step.dependencies.length === 0) && steps.length > 2;
 
   // تقدير المدة الإجمالية
   const totalTime = steps.reduce((sum, step) => sum + step.estimatedTime, 0);
@@ -254,13 +354,13 @@ export async function createExecutionPlan(analysis: AgentAnalysis, context: Agen
  * const result = await executeAgentPlan(plan, analysis, context);
  */
 export async function executeAgentPlan(
-  plan: AgentPlan, 
-  analysis: AgentAnalysis, 
-  context: AgentContext
+  plan: AgentPlan,
+  analysis: AgentAnalysis,
+  context: AgentContext,
 ): Promise<string> {
   const executionResults: string[] = [];
   const startTime = Date.now();
-  
+
   // محاكاة الأدوات المتاحة
   const tools = createMockTools();
 
@@ -268,7 +368,7 @@ export async function executeAgentPlan(
   executionResults.push(`⚡ **مستوى الثقة:** ${(analysis.confidence * 100).toFixed(1)}%`);
   executionResults.push(`🎯 **النية المحددة:** ${getIntentDisplayName(analysis.intent)}`);
   executionResults.push(`📊 **التعقيد:** ${getComplexityDisplayName(analysis.complexity)}`);
-  
+
   if (analysis.tools.length > 0) {
     executionResults.push(`🛠️ **الأدوات المستخدمة:** ${analysis.tools.join(', ')}`);
   }
@@ -279,23 +379,23 @@ export async function executeAgentPlan(
   for (let i = 0; i < plan.steps.length; i++) {
     const step = plan.steps[i];
     const stepNumber = i + 1;
-    
+
     executionResults.push(`\n**${stepNumber}.** ${step.description}`);
-    
+
     // محاكاة تنفيذ الخطوة
     const stepResult = await executeStep(step, tools, analysis);
     executionResults.push(`   ${stepResult.status} ${stepResult.message}`);
-    
+
     if (stepResult.details) {
       executionResults.push(`   📝 ${stepResult.details}`);
     }
-    
+
     // محاكاة التأخير الطبيعي
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
   const executionTime = Date.now() - startTime;
-  
+
   executionResults.push(`\n⏱️ **الإحصائيات:**`);
   executionResults.push(`   • وقت التنفيذ: ${executionTime}ms`);
   executionResults.push(`   • عدد الخطوات: ${plan.steps.length}`);
@@ -318,13 +418,13 @@ export async function routeAgentRequest(context: AgentContext): Promise<string> 
   try {
     // 1. تحليل متقدم للطلب
     const analysis = await analyzeUserRequest(context);
-    
+
     // 2. إنشاء خطة تنفيذ مفصلة
     const plan = await createExecutionPlan(analysis, context);
-    
+
     // 3. تنفيذ الخطة مع الأدوات
     const response = await executeAgentPlan(plan, analysis, context);
-    
+
     return response;
   } catch (error) {
     console.error('خطأ في Agent Mode المحسن:', error);
@@ -378,16 +478,19 @@ function getStepConfiguration(action: string, analysis: AgentAnalysis) {
       dependencies: ['generate_code'],
       estimatedTime: 2000,
     },
+
     // إضافة المزيد من التكوينات...
   };
 
-  return configs[action] || {
-    description: `⚙️ تنفيذ ${action}`,
-    priority: 3,
-    tool: 'general',
-    dependencies: [],
-    estimatedTime: 1000,
-  };
+  return (
+    configs[action] || {
+      description: `⚙️ تنفيذ ${action}`,
+      priority: 3,
+      tool: 'general',
+      dependencies: [],
+      estimatedTime: 1000,
+    }
+  );
 }
 
 async function executeStep(step: any, tools: AgentTools, analysis: AgentAnalysis) {
@@ -396,30 +499,32 @@ async function executeStep(step: any, tools: AgentTools, analysis: AgentAnalysis
     analyze_requirements: {
       status: '✅',
       message: 'تم تحليل المتطلبات بنجاح',
-      details: 'تحديد 3 متطلبات أساسية و 2 متطلبات اختيارية'
+      details: 'تحديد 3 متطلبات أساسية و 2 متطلبات اختيارية',
     },
     generate_code: {
       status: '💻',
       message: 'تم توليد الكود بأفضل الممارسات',
-      details: 'استخدام TypeScript مع معالجة الأخطاء'
+      details: 'استخدام TypeScript مع معالجة الأخطاء',
     },
     analyze_error: {
       status: '🔍',
       message: 'تم تحديد سبب الخطأ',
-      details: 'خطأ في معالجة البيانات غير المتزامنة'
+      details: 'خطأ في معالجة البيانات غير المتزامنة',
     },
     research_topic: {
       status: '📚',
       message: 'تم جمع المعلومات الحديثة',
-      details: 'العثور على 5 مصادر موثوقة'
-    }
+      details: 'العثور على 5 مصادر موثوقة',
+    },
   };
 
-  return mockResults[step.action] || {
-    status: '⚙️',
-    message: 'تم تنفيذ الخطوة بنجاح',
-    details: null
-  };
+  return (
+    mockResults[step.action] || {
+      status: '⚙️',
+      message: 'تم تنفيذ الخطوة بنجاح',
+      details: null,
+    }
+  );
 }
 
 function createMockTools(): AgentTools {
@@ -444,7 +549,7 @@ function getIntentDisplayName(intent: string): string {
     integration: 'التكامل والربط',
     deployment: 'النشر والإطلاق',
     analysis: 'التحليل والمراجعة',
-    general: 'عام'
+    general: 'عام',
   };
   return names[intent] || intent;
 }
@@ -453,7 +558,7 @@ function getComplexityDisplayName(complexity: string): string {
   const names: Record<string, string> = {
     simple: 'بسيط 🟢',
     moderate: 'متوسط 🟡',
-    complex: 'معقد 🔴'
+    complex: 'معقد 🔴',
   };
   return names[complexity] || complexity;
 }
@@ -462,20 +567,35 @@ function getRiskDisplayName(risk: string): string {
   const names: Record<string, string> = {
     low: 'منخفض 🟢',
     medium: 'متوسط 🟡',
-    high: 'عالي 🔴'
+    high: 'عالي 🔴',
   };
   return names[risk] || risk;
 }
 
 function formatDuration(ms: number): string {
-  if (ms < 2000) return '1-2 ثواني';
-  if (ms < 5000) return '2-5 ثواني';
-  if (ms < 10000) return '5-10 ثواني';
+  if (ms < 2000) {
+    return '1-2 ثواني';
+  }
+
+  if (ms < 5000) {
+    return '2-5 ثواني';
+  }
+
+  if (ms < 10000) {
+    return '5-10 ثواني';
+  }
+
   return '10+ ثواني';
 }
 
 function assessRiskLevel(analysis: AgentAnalysis, stepCount: number): 'low' | 'medium' | 'high' {
-  if (analysis.complexity === 'complex' || stepCount > 5) return 'high';
-  if (analysis.complexity === 'moderate' || stepCount > 3) return 'medium';
+  if (analysis.complexity === 'complex' || stepCount > 5) {
+    return 'high';
+  }
+
+  if (analysis.complexity === 'moderate' || stepCount > 3) {
+    return 'medium';
+  }
+
   return 'low';
 }

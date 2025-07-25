@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { Switch } from '@radix-ui/react-switch';
@@ -157,10 +157,13 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
+
   // نافذة الملحقات
   const [showExtensions, setShowExtensions] = useState(false);
+
   // نافذة المظهر
   const [showTheme, setShowTheme] = useState(false);
+
   // نافذة النماذج
   const [showModels, setShowModels] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -170,9 +173,13 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
 
   // 2. Function to install extension
   async function handleInstallExtension() {
-    if (!searchTerm) return;
+    if (!searchTerm) {
+      return;
+    }
+
     setInstalling(true);
     setInstallMsg('');
+
     try {
       const res = await fetch('/api/vscode/extension', {
         method: 'POST',
@@ -180,8 +187,15 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
         body: JSON.stringify({ extensionId: searchTerm }),
       });
       const data = await res.json();
-      setInstallMsg(data.status === 'success' ? 'تم التثبيت بنجاح' : data.message || 'حدث خطأ');
+
+      if (typeof data === 'object' && data !== null && 'status' in data) {
+        setInstallMsg((data as any).status === 'success' ? 'تم التثبيت بنجاح' : (data as any).message || 'حدث خطأ');
+      } else {
+        setInstallMsg('حدث خطأ');
+      }
+
       setSearchTerm('');
+
       // يمكنك تحديث قائمة الملحقات المثبتة هنا
     } catch (e) {
       setInstallMsg('حدث خطأ أثناء التثبيت');
@@ -444,7 +458,10 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg-main)] py-16">
       <div className="w-full max-w-lg card flex flex-col items-center justify-center text-center shadow-lg p-10">
-        <div className="icon mb-8" style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem', fontSize: '2.5rem' }}>
+        <div
+          className="icon mb-8"
+          style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem', fontSize: '2.5rem' }}
+        >
           <span className="i-ph:gear-six-bold text-5xl" style={{ color: 'var(--primary)' }} />
         </div>
         <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
@@ -454,13 +471,22 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
           تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
         </p>
         <div className="flex flex-col gap-5 w-full">
-          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowExtensions(true)}>
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowExtensions(true)}
+          >
             <span className="i-ph:puzzle-piece-bold text-xl" /> الملحقات
           </button>
-          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowTheme(true)}>
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowTheme(true)}
+          >
             <span className="i-ph:paint-brush-broad-bold text-xl" /> المظهر
           </button>
-          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowModels(true)}>
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowModels(true)}
+          >
             <span className="i-ph:cpu-bold text-xl" /> النماذج
           </button>
         </div>
@@ -480,11 +506,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
               <span className="text-lg font-bold text-black">إدارة ملحقات VSCode</span>
             </div>
             <div className="flex-1 overflow-hidden flex items-center justify-center">
-              <iframe
-                src="http://localhost:3001"
-                title="VSCode Web"
-                className="w-full h-full border-0 rounded-b-2xl"
-              />
+              <iframe src="http://localhost:3001" title="VSCode Web" className="w-full h-full border-0 rounded-b-2xl" />
             </div>
           </div>
         </div>

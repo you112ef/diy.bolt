@@ -38,8 +38,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       badge: 'NEW',
       stats: {
         value: isAgentMode ? 'مُفعّل' : 'متوقف',
-        label: 'الحالة'
-      }
+        label: 'الحالة',
+      },
     },
     {
       id: 'code-editor',
@@ -49,8 +49,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       status: 'active',
       stats: {
         value: '12',
-        label: 'ملف مفتوح'
-      }
+        label: 'ملف مفتوح',
+      },
     },
     {
       id: 'terminal',
@@ -60,8 +60,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       status: 'active',
       stats: {
         value: '3',
-        label: 'جلسة نشطة'
-      }
+        label: 'جلسة نشطة',
+      },
     },
     {
       id: 'file-manager',
@@ -71,8 +71,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       status: 'active',
       stats: {
         value: '247',
-        label: 'ملف'
-      }
+        label: 'ملف',
+      },
     },
     {
       id: 'git-integration',
@@ -83,8 +83,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       badge: 'BETA',
       stats: {
         value: '8',
-        label: 'commits'
-      }
+        label: 'commits',
+      },
     },
     {
       id: 'deployment',
@@ -95,8 +95,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       badge: 'BETA',
       stats: {
         value: '2',
-        label: 'نشرة نشطة'
-      }
+        label: 'نشرة نشطة',
+      },
     },
     {
       id: 'ai-assistant',
@@ -106,8 +106,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       status: isAgentMode ? 'active' : 'inactive',
       stats: {
         value: '95%',
-        label: 'دقة'
-      }
+        label: 'دقة',
+      },
     },
     {
       id: 'analytics',
@@ -118,8 +118,8 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       badge: 'NEW',
       stats: {
         value: '24h',
-        label: 'آخر تحديث'
-      }
+        label: 'آخر تحديث',
+      },
     },
     {
       id: 'settings',
@@ -129,20 +129,21 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
       status: 'active',
       stats: {
         value: '12',
-        label: 'إعداد'
-      }
-    }
+        label: 'إعداد',
+      },
+    },
   ];
 
   const handleCardClick = async (card: DashboardCard) => {
     if (card.action) {
       setIsLoading(true);
       setSelectedCard(card.id);
-      
+
       try {
         await card.action();
+
         // محاكاة تأخير للتأثير البصري
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300));
       } catch (error) {
         console.error('خطأ في تنفيذ العملية:', error);
       } finally {
@@ -184,19 +185,13 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
     <div className={classNames('enhanced-dashboard', className)}>
       {showWelcome && (
         <div className="mb-8 text-center">
-          <h1 className="enhanced-text title mb-4">
-            مرحبًا بك في Bolt.diy المحسن
-          </h1>
-          <p className="enhanced-text subtitle mb-6">
-            منصة تطوير متكاملة مع ذكاء اصطناعي متقدم
-          </p>
-          
+          <h1 className="enhanced-text title mb-4">مرحبًا بك في Bolt.diy المحسن</h1>
+          <p className="enhanced-text subtitle mb-6">منصة تطوير متكاملة مع ذكاء اصطناعي متقدم</p>
+
           {isAgentMode && (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full">
               <div className="i-ph:robot text-purple-400" />
-              <span className="enhanced-text caption text-purple-300">
-                وضع الذكاء الصناعي مُفعّل
-              </span>
+              <span className="enhanced-text caption text-purple-300">وضع الذكاء الصناعي مُفعّل</span>
             </div>
           )}
         </div>
@@ -206,19 +201,15 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
         {dashboardCards.map((card) => (
           <div
             key={card.id}
-            className={classNames(
-              'enhanced-card',
-              'group cursor-pointer relative overflow-hidden',
-              {
-                'agent-active': card.status === 'active' && isAgentMode,
-                'opacity-75 scale-95': selectedCard === card.id && isLoading,
-              }
-            )}
+            className={classNames('enhanced-card', 'group cursor-pointer relative overflow-hidden', {
+              'agent-active': card.status === 'active' && isAgentMode,
+              'opacity-75 scale-95': selectedCard === card.id && isLoading,
+            })}
             onClick={() => handleCardClick(card)}
           >
             {/* شريط الحالة العلوي */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
+
             {/* محتوى البطاقة */}
             <div className="p-6">
               {/* الرأس */}
@@ -228,41 +219,33 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
                     <div className={classNames(card.icon, 'text-xl')} />
                   </div>
                   <div className="flex flex-col">
-                    <h3 className="enhanced-text subtitle mb-1">
-                      {card.title}
-                    </h3>
+                    <h3 className="enhanced-text subtitle mb-1">{card.title}</h3>
                     <div className="flex items-center gap-2">
                       {getCardStatusIcon(card.status)}
                       <span className="enhanced-text caption">
-                        {card.status === 'active' ? 'نشط' : 
-                         card.status === 'inactive' ? 'متوقف' :
-                         card.status === 'new' ? 'جديد' : 'تجريبي'}
+                        {card.status === 'active'
+                          ? 'نشط'
+                          : card.status === 'inactive'
+                            ? 'متوقف'
+                            : card.status === 'new'
+                              ? 'جديد'
+                              : 'تجريبي'}
                       </span>
                     </div>
                   </div>
                 </div>
-                
-                {card.badge && (
-                  <span className={getBadgeClass(card.badge)}>
-                    {card.badge}
-                  </span>
-                )}
+
+                {card.badge && <span className={getBadgeClass(card.badge)}>{card.badge}</span>}
               </div>
 
               {/* الوصف */}
-              <p className="enhanced-text body mb-4 opacity-80">
-                {card.description}
-              </p>
+              <p className="enhanced-text body mb-4 opacity-80">{card.description}</p>
 
               {/* الإحصائيات */}
               {card.stats && (
                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                  <span className="enhanced-text caption">
-                    {card.stats.label}
-                  </span>
-                  <span className="enhanced-text subtitle font-bold text-purple-400">
-                    {card.stats.value}
-                  </span>
+                  <span className="enhanced-text caption">{card.stats.label}</span>
+                  <span className="enhanced-text subtitle font-bold text-purple-400">{card.stats.value}</span>
                 </div>
               )}
 
@@ -304,15 +287,15 @@ export function EnhancedDashboard({ className, showWelcome = true }: EnhancedDas
 }
 
 // مكون مساعد للبطاقات الصغيرة
-export function DashboardMiniCard({ 
-  title, 
-  value, 
-  icon, 
-  trend 
-}: { 
-  title: string; 
-  value: string; 
-  icon: string; 
+export function DashboardMiniCard({
+  title,
+  value,
+  icon,
+  trend,
+}: {
+  title: string;
+  value: string;
+  icon: string;
   trend?: 'up' | 'down' | 'stable';
 }) {
   const getTrendIcon = () => {
