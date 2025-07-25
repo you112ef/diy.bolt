@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { Switch } from '@radix-ui/react-switch';
@@ -157,6 +157,51 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
+
+  // نافذة الملحقات
+  const [showExtensions, setShowExtensions] = useState(false);
+
+  // نافذة المظهر
+  const [showTheme, setShowTheme] = useState(false);
+
+  // نافذة النماذج
+  const [showModels, setShowModels] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [installing, setInstalling] = useState(false);
+  const [installMsg, setInstallMsg] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+
+  // 2. Function to install extension
+  async function handleInstallExtension() {
+    if (!searchTerm) {
+      return;
+    }
+
+    setInstalling(true);
+    setInstallMsg('');
+
+    try {
+      const res = await fetch('/api/vscode/extension', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extensionId: searchTerm }),
+      });
+      const data = await res.json();
+
+      if (typeof data === 'object' && data !== null && 'status' in data) {
+        setInstallMsg((data as any).status === 'success' ? 'تم التثبيت بنجاح' : (data as any).message || 'حدث خطأ');
+      } else {
+        setInstallMsg('حدث خطأ');
+      }
+
+      setSearchTerm('');
+
+      // يمكنك تحديث قائمة الملحقات المثبتة هنا
+    } catch (e) {
+      setInstallMsg('حدث خطأ أثناء التثبيت');
+    }
+    setInstalling(false);
+  }
 
   // Store values
   const tabConfiguration = useStore(tabConfigurationStore);
@@ -411,145 +456,105 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   };
 
   return (
-    <RadixDialog.Root open={open}>
-      <RadixDialog.Portal>
-        <div className="fixed inset-0 flex items-center justify-center z-[100] modern-scrollbar">
-          <RadixDialog.Overlay asChild>
-            <motion.div
-              className="absolute inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-          </RadixDialog.Overlay>
-
-          <RadixDialog.Content
-            aria-describedby={undefined}
-            onEscapeKeyDown={handleClose}
-            onPointerDownOutside={handleClose}
-            className="relative z-[101]"
-          >
-            <motion.div
-              className={classNames(
-                'w-[1200px] h-[90vh]',
-                'bg-[#FAFAFA] dark:bg-[#0A0A0A]',
-                'rounded-2xl shadow-2xl',
-                'border border-[#E5E5E5] dark:border-[#1A1A1A]',
-                'flex flex-col overflow-hidden',
-                'relative',
-              )}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <BackgroundRays />
-              </div>
-              <div className="relative z-10 flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center space-x-4">
-                    {(activeTab || showTabManagement) && (
-                      <button
-                        onClick={handleBack}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
-                      >
-                        <div className="i-ph:arrow-left w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
-                      </button>
-                    )}
-                    <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {showTabManagement ? 'Tab Management' : activeTab ? TAB_LABELS[activeTab] : 'Control Panel'}
-                    </DialogTitle>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    {/* Mode Toggle */}
-                    <div className="flex items-center gap-2 min-w-[140px] border-r border-gray-200 dark:border-gray-800 pr-6">
-                      <AnimatedSwitch
-                        id="developer-mode"
-                        checked={developerMode}
-                        onCheckedChange={handleDeveloperModeChange}
-                        label={developerMode ? 'Developer Mode' : 'User Mode'}
-                      />
-                    </div>
-
-                    {/* Avatar and Dropdown */}
-                    <div className="border-l border-gray-200 dark:border-gray-800 pl-6">
-                      <AvatarDropdown onSelectTab={handleTabClick} />
-                    </div>
-
-                    {/* Close Button */}
-                    <button
-                      onClick={handleClose}
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
-                    >
-                      <div className="i-ph:x w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div
-                  className={classNames(
-                    'flex-1',
-                    'overflow-y-auto',
-                    'hover:overflow-y-auto',
-                    'scrollbar scrollbar-w-2',
-                    'scrollbar-track-transparent',
-                    'scrollbar-thumb-[#E5E5E5] hover:scrollbar-thumb-[#CCCCCC]',
-                    'dark:scrollbar-thumb-[#333333] dark:hover:scrollbar-thumb-[#444444]',
-                    'will-change-scroll',
-                    'touch-auto',
-                  )}
-                >
-                  <motion.div
-                    key={activeTab || 'home'}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-6"
-                  >
-                    {showTabManagement ? (
-                      <TabManagement />
-                    ) : activeTab ? (
-                      getTabComponent(activeTab)
-                    ) : (
-                      <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative"
-                        variants={gridLayoutVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <AnimatePresence mode="popLayout">
-                          {(visibleTabs as TabWithDevType[]).map((tab: TabWithDevType) => (
-                            <motion.div key={tab.id} layout variants={itemVariants} className="aspect-[1.5/1]">
-                              <TabTile
-                                tab={tab}
-                                onClick={() => handleTabClick(tab.id as TabType)}
-                                isActive={activeTab === tab.id}
-                                hasUpdate={getTabUpdateStatus(tab.id)}
-                                statusMessage={getStatusMessage(tab.id)}
-                                description={TAB_DESCRIPTIONS[tab.id]}
-                                isLoading={loadingTab === tab.id}
-                                className="h-full relative"
-                              >
-                                {BETA_TABS.has(tab.id) && <BetaLabel />}
-                              </TabTile>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          </RadixDialog.Content>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg-main)] py-16">
+      <div className="w-full max-w-lg card flex flex-col items-center justify-center text-center shadow-lg p-10">
+        <div
+          className="icon mb-8"
+          style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem', fontSize: '2.5rem' }}
+        >
+          <span className="i-ph:gear-six-bold text-5xl" style={{ color: 'var(--primary)' }} />
         </div>
-      </RadixDialog.Portal>
-    </RadixDialog.Root>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+          الإعدادات
+        </h1>
+        <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
+          تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
+        </p>
+        <div className="flex flex-col gap-5 w-full">
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowExtensions(true)}
+          >
+            <span className="i-ph:puzzle-piece-bold text-xl" /> الملحقات
+          </button>
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowTheme(true)}
+          >
+            <span className="i-ph:paint-brush-broad-bold text-xl" /> المظهر
+          </button>
+          <button
+            className="button w-full flex items-center justify-center gap-2 text-lg"
+            onClick={() => setShowModels(true)}
+          >
+            <span className="i-ph:cpu-bold text-xl" /> النماذج
+          </button>
+        </div>
+      </div>
+      {/* نافذة الملحقات */}
+      {showExtensions && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col relative">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
+              onClick={() => setShowExtensions(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <div className="flex items-center gap-2 p-6 border-b border-[#ececec]">
+              <span className="i-ph:puzzle-piece-bold text-2xl text-[#8A5FFF]" />
+              <span className="text-lg font-bold text-black">إدارة ملحقات VSCode</span>
+            </div>
+            <div className="flex-1 overflow-hidden flex items-center justify-center">
+              <iframe src="http://localhost:3001" title="VSCode Web" className="w-full h-full border-0 rounded-b-2xl" />
+            </div>
+          </div>
+        </div>
+      )}
+      {/* نافذة المظهر */}
+      {showTheme && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
+              onClick={() => setShowTheme(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <span className="i-ph:paint-brush-broad-bold text-3xl text-[#8A5FFF] mb-4" />
+            <h2 className="text-xl font-bold mb-2">تغيير المظهر</h2>
+            <p className="text-base mb-4 text-gray-600">اختر الوضع الليلي أو النهاري أو لون مخصص.</p>
+            {/* خيارات المظهر (ليلي/نهاري/مخصص) */}
+            <div className="flex gap-4">
+              <button className="button">ليلي</button>
+              <button className="button">نهاري</button>
+              <button className="button">مخصص</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* نافذة النماذج */}
+      {showModels && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
+              onClick={() => setShowModels(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <span className="i-ph:cpu-bold text-3xl text-[#8A5FFF] mb-4" />
+            <h2 className="text-xl font-bold mb-2">إدارة النماذج</h2>
+            <p className="text-base mb-4 text-gray-600">إضافة أو إزالة أو تخصيص نماذج الذكاء الاصطناعي.</p>
+            {/* قائمة النماذج أو خيارات الإدارة */}
+            <div className="flex flex-col gap-2 w-full">
+              <button className="button w-full">إضافة نموذج جديد</button>
+              <button className="button w-full">إزالة نموذج</button>
+              <button className="button w-full">تخصيص</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

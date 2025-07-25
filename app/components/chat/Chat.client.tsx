@@ -27,6 +27,8 @@ import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
+import { routeAgentRequest } from '~/lib/agentRouter';
+import type { IProviderConfig } from '~/types/model';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -116,7 +118,7 @@ interface ChatProps {
 export const ChatImpl = memo(
   ({ description, initialMessages, storeMessageHistory, importChat, exportChat }: ChatProps) => {
     useShortcuts();
-    
+
     const { isAgentMode, toggleAgentMode } = useAgentMode();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [chatStarted, setChatStarted] = useState(initialMessages.length > 0);
@@ -309,6 +311,49 @@ export const ChatImpl = memo(
 
       if (isLoading) {
         abort();
+        return;
+      }
+
+      // If Agent Mod is enabled, route through agentRouter
+      if (isAgentMode) {
+        try {
+          // Construct AgentContext
+          const userText = `[Model: ${model}][Provider: ${provider.name}]
+
+${messageContent}`;
+          const imagesText = imageDataList.length > 0 ? `\n\n[Images attached: ${imageDataList.length}]` : '';
+          const agentContext = {
+            messages: [
+              ...messages,
+              {
+                id: `${Date.now()}`,
+                role: 'user' as const,
+                content: userText + imagesText,
+              },
+            ],
+            files: workbenchStore.getModifiedFiles?.() || undefined,
+            apiKeys: {}, // يمكنك تمرير مفاتيح API إذا لزم الأمر
+            providerSettings: 'settings' in provider && provider.settings ? { [provider.name]: provider.settings } : {},
+            contextOptimization: contextOptimizationEnabled,
+          };
+          setInput('');
+          Cookies.remove(PROMPT_COOKIE_KEY);
+          setUploadedFiles([]);
+          setImageDataList([]);
+          resetEnhancer();
+          textareaRef.current?.blur();
+          setFakeLoading(true);
+
+          const agentResponse = await routeAgentRequest(agentContext);
+          setFakeLoading(false);
+          append({
+            role: 'assistant',
+            content: agentResponse,
+          });
+        } catch (err) {
+          setFakeLoading(false);
+          toast.error('حدث خطأ أثناء معالجة Agent Mod');
+        }
         return;
       }
 

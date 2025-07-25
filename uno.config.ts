@@ -232,10 +232,7 @@ export default defineConfig({
   transformers: [transformerDirectives()],
   presets: [
     presetUno({
-      dark: {
-        light: '[data-theme="light"]',
-        dark: '[data-theme="dark"]',
-      },
+      dark: 'class', // Enable dark mode via class strategy (like Tailwind's darkMode: 'class')
     }),
     presetIcons({
       warn: true,
