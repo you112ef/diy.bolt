@@ -157,6 +157,8 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
+  // 1. Add a new state for showing the Extensions modal
+  const [showExtensions, setShowExtensions] = useState(false);
 
   // Store values
   const tabConfiguration = useStore(tabConfigurationStore);
@@ -538,6 +540,16 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                             )}
                           </div>
                         ))}
+                        {/* Extensions Card */}
+                        <div
+                          className="relative bg-gradient-to-br from-[#232336] to-[#181824] dark:from-[#232336] dark:to-[#181824] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-lg hover:ring-2 ring-[#a78bfa]/50 transition-all duration-200 cursor-pointer"
+                          onClick={() => setShowExtensions(true)}
+                        >
+                          <div className="w-6 h-6 mb-2 opacity-90 text-[#a78bfa] dark:text-[#c4b5fd]">
+                            <span className="i-ph:puzzle-piece" />
+                          </div>
+                          <span className="text-sm font-semibold text-white/90 dark:text-white/95 drop-shadow-sm">الملحقات</span>
+                        </div>
                       </div>
                     )}
                   </motion.div>
@@ -547,6 +559,30 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
           </RadixDialog.Content>
         </div>
       </RadixDialog.Portal>
+      {showExtensions && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#181824] rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col relative">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white"
+              onClick={() => setShowExtensions(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <div className="flex items-center gap-2 p-6 border-b border-[#232336]">
+              <span className="i-ph:puzzle-piece text-2xl text-[#a78bfa]" />
+              <span className="text-lg font-bold text-white">إدارة ملحقات VSCode</span>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              {/* VSCode Web iframe (replace the src with your openvscode-server/code-server URL) */}
+              <iframe
+                src="http://localhost:3001" // يمكنك تخصيص الرابط من الإعدادات لاحقًا
+                title="VSCode Web"
+                className="w-full h-full border-0 rounded-b-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </RadixDialog.Root>
   );
 };
