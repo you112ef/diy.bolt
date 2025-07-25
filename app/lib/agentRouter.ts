@@ -33,27 +33,35 @@ export interface AgentPlan {
   riskLevel: 'low' | 'medium' | 'high';
 }
 
-export interface AgentContext {
-  messages: Message[];
-  files?: any;
-  apiKeys: Record<string, string>;
-  providerSettings: Record<string, IProviderSetting>;
-  contextOptimization?: boolean;
-}
+/**
+ * AgentContext: السياق الكامل الذي يستلمه الوكيل الذكي (Agent Mod)
+ * @typedef {Object} AgentContext
+ * @property {Message[]} messages - جميع رسائل الدردشة (user/assistant)
+ * @property {any} [files] - الملفات المفتوحة أو المعدلة
+ * @property {Record<string, string>} apiKeys - مفاتيح API المتاحة
+ * @property {Record<string, IProviderSetting>} providerSettings - إعدادات مزود النموذج
+ * @property {boolean} [contextOptimization] - تفعيل تحسين السياق
+ */
 
-export interface AgentTools {
-  fileSearch: (query: string) => Promise<string[]>;
-  codeAnalysis: (code: string) => Promise<any>;
-  errorDiagnostics: (error: string) => Promise<any>;
-  webSearch: (query: string) => Promise<any>;
-  documentGeneration: (content: any) => Promise<string>;
-  gitOperations: (command: string) => Promise<any>;
-  terminalExecution: (command: string) => Promise<any>;
-  databaseQuery: (query: string) => Promise<any>;
-}
+/**
+ * AgentTools: الأدوات التي يمكن للوكيل استخدامها (تحليل كود، بحث ويب، إلخ)
+ * @typedef {Object} AgentTools
+ * @property {function(string): Promise<string[]>} fileSearch
+ * @property {function(string): Promise<any>} codeAnalysis
+ * @property {function(string): Promise<any>} errorDiagnostics
+ * @property {function(string): Promise<any>} webSearch
+ * @property {function(any): Promise<string>} documentGeneration
+ * @property {function(string): Promise<any>} gitOperations
+ * @property {function(string): Promise<any>} terminalExecution
+ * @property {function(string): Promise<any>} databaseQuery
+ */
 
 /**
  * 🔍 تحليل متقدم لطلب المستخدم مع فهم عميق للسياق
+ * @param {AgentContext} context - السياق الكامل للدردشة
+ * @returns {Promise<AgentAnalysis>} تحليل النوايا والمتطلبات
+ * @example
+ * const analysis = await analyzeUserRequest({ messages, files, apiKeys, providerSettings });
  */
 export async function analyzeUserRequest(context: AgentContext): Promise<AgentAnalysis> {
   const lastMessage = context.messages[context.messages.length - 1];
@@ -184,6 +192,11 @@ export async function analyzeUserRequest(context: AgentContext): Promise<AgentAn
 
 /**
  * 📋 إنشاء خطة تنفيذ متقدمة ومفصلة
+ * @param {AgentAnalysis} analysis - نتيجة التحليل
+ * @param {AgentContext} context - السياق الكامل
+ * @returns {Promise<AgentPlan>} خطة التنفيذ
+ * @example
+ * const plan = await createExecutionPlan(analysis, context);
  */
 export async function createExecutionPlan(analysis: AgentAnalysis, context: AgentContext): Promise<AgentPlan> {
   const steps: AgentPlan['steps'] = [];
@@ -233,6 +246,12 @@ export async function createExecutionPlan(analysis: AgentAnalysis, context: Agen
 
 /**
  * 🚀 تنفيذ الخطة مع محاكاة أدواتي الحقيقية
+ * @param {AgentPlan} plan - خطة التنفيذ
+ * @param {AgentAnalysis} analysis - نتيجة التحليل
+ * @param {AgentContext} context - السياق الكامل
+ * @returns {Promise<string>} الرد النهائي للوكيل
+ * @example
+ * const result = await executeAgentPlan(plan, analysis, context);
  */
 export async function executeAgentPlan(
   plan: AgentPlan, 
@@ -290,6 +309,10 @@ export async function executeAgentPlan(
 
 /**
  * 🎛️ الدالة الرئيسية لتوجيه Agent المحسن
+ * @param {AgentContext} context - السياق الكامل (يأتي من Chat.client.tsx)
+ * @returns {Promise<string>} الرد النهائي للوكيل الذكي
+ * @example
+ * const response = await routeAgentRequest(context);
  */
 export async function routeAgentRequest(context: AgentContext): Promise<string> {
   try {
