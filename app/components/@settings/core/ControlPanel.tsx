@@ -443,25 +443,25 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg-main)] py-16">
-      <div className="w-full max-w-xl card flex flex-col items-center justify-center text-center shadow-lg">
-        <div className="icon mb-6" style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem' }}>
+      <div className="w-full max-w-lg card flex flex-col items-center justify-center text-center shadow-lg p-10">
+        <div className="icon mb-8" style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem', fontSize: '2.5rem' }}>
           <span className="i-ph:gear-six-bold text-5xl" style={{ color: 'var(--primary)' }} />
         </div>
         <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
           الإعدادات
         </h1>
-        <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
           تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
         </p>
-        <div className="flex flex-col gap-4 w-full">
-          <button className="button w-full" onClick={() => setShowExtensions(true)}>
-            <span className="i-ph:puzzle-piece-bold mr-2 text-xl" /> الملحقات
+        <div className="flex flex-col gap-5 w-full">
+          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowExtensions(true)}>
+            <span className="i-ph:puzzle-piece-bold text-xl" /> الملحقات
           </button>
-          <button className="button w-full" onClick={() => setShowTheme(true)}>
-            <span className="i-ph:paint-brush-broad-bold mr-2 text-xl" /> المظهر
+          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowTheme(true)}>
+            <span className="i-ph:paint-brush-broad-bold text-xl" /> المظهر
           </button>
-          <button className="button w-full" onClick={() => setShowModels(true)}>
-            <span className="i-ph:cpu-bold mr-2 text-xl" /> النماذج
+          <button className="button w-full flex items-center justify-center gap-2 text-lg" onClick={() => setShowModels(true)}>
+            <span className="i-ph:cpu-bold text-xl" /> النماذج
           </button>
         </div>
       </div>

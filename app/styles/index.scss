@@ -47,6 +47,11 @@ body {
   box-shadow: var(--shadow);
   border: none;
   font-size: 1.1rem;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.button:hover, .btn:hover, .Button:hover {
+  box-shadow: 0 8px 32px rgba(138,95,255,0.12);
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
 }
 
 .icon, .Icon, .icon-btn, .icon-button {
