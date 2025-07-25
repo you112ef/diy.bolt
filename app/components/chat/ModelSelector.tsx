@@ -1,10 +1,12 @@
 import type { ProviderInfo } from '~/types/model';
-import { useEffect, useState, useRef } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import { classNames } from '~/utils/classNames';
 import { AgentToggleButton } from './AgentToggleButton';
 import { useStore } from '@nanostores/react';
+
 import { agentModelsStore, isModelInAgentMode, getAgentByModel } from '~/lib/stores/agent-mode';
 
 interface ModelSelectorProps {
@@ -27,7 +29,7 @@ export const ModelSelector = ({
   providerList,
   modelLoading,
 }: ModelSelectorProps) => {
-  const agentModels = useStore(agentModelsStore);
+  const _agentModels = useStore(agentModelsStore);
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [focusedModelIndex, setFocusedModelIndex] = useState(-1);
@@ -305,9 +307,9 @@ export const ModelSelector = ({
               {filteredProviders.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">No providers found</div>
               ) : (
-                filteredProviders.map((providerOption, index) => (
+                filteredProviders.map((providerOption, providerIdx) => (
                   <div
-                    ref={(el) => (providerOptionsRef.current[index] = el)}
+                    ref={(el) => (providerOptionsRef.current[providerIdx] = el)}
                     key={providerOption.name}
                     role="option"
                     aria-selected={provider?.name === providerOption.name}
@@ -316,10 +318,10 @@ export const ModelSelector = ({
                       'hover:bg-bolt-elements-background-depth-3',
                       'text-bolt-elements-textPrimary',
                       'outline-none',
-                      provider?.name === providerOption.name || focusedProviderIndex === index
+                      provider?.name === providerOption.name || focusedProviderIndex === providerIdx
                         ? 'bg-bolt-elements-background-depth-2'
                         : undefined,
-                      focusedProviderIndex === index ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
+                      focusedProviderIndex === providerIdx ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
                     )}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -337,7 +339,7 @@ export const ModelSelector = ({
                       setIsProviderDropdownOpen(false);
                       setProviderSearchQuery('');
                     }}
-                    tabIndex={focusedProviderIndex === index ? 0 : -1}
+                    tabIndex={focusedProviderIndex === providerIdx ? 0 : -1}
                   >
                     {providerOption.name}
                   </div>
@@ -455,14 +457,14 @@ export const ModelSelector = ({
               ) : filteredModels.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">No models found</div>
               ) : (
-                filteredModels.map((modelOption, index) => {
+                filteredModels.map((modelOption, modelIdx) => {
                   const isAgent = isModelInAgentMode(modelOption.name, provider?.name || '');
                   const agent = getAgentByModel(modelOption.name, provider?.name || '');
 
                   return (
                     <div
-                      ref={(el) => (modelOptionsRef.current[index] = el)}
-                      key={index} // Consider using modelOption.name if unique
+                      ref={(el) => (modelOptionsRef.current[modelIdx] = el)}
+                      key={modelIdx} // Consider using modelOption.name if unique
                       role="option"
                       aria-selected={model === modelOption.name}
                       className={classNames(
@@ -470,10 +472,10 @@ export const ModelSelector = ({
                         'hover:bg-bolt-elements-background-depth-3',
                         'text-bolt-elements-textPrimary',
                         'outline-none',
-                        model === modelOption.name || focusedModelIndex === index
+                        model === modelOption.name || focusedModelIndex === modelIdx
                           ? 'bg-bolt-elements-background-depth-2'
                           : undefined,
-                        focusedModelIndex === index ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
+                        focusedModelIndex === modelIdx ? 'ring-1 ring-inset ring-bolt-elements-focus' : undefined,
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -481,7 +483,7 @@ export const ModelSelector = ({
                         setIsModelDropdownOpen(false);
                         setModelSearchQuery('');
                       }}
-                      tabIndex={focusedModelIndex === index ? 0 : -1}
+                      tabIndex={focusedModelIndex === modelIdx ? 0 : -1}
                     >
                       <div className="flex items-center gap-2 flex-1">
                         {isAgent && <div className="i-ph:robot-duotone text-blue-500 text-sm" />}

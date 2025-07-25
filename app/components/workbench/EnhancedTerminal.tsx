@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import React, { useState, memo } from 'react';
 import { classNames } from '~/utils/classNames';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
@@ -183,8 +183,8 @@ export const EnhancedTerminal = memo(({ className, onCommand }: EnhancedTerminal
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-            {((LANGUAGE_COMMANDS as any)[selectedLanguage]?.commands || []).map((cmd: any, index: number) => (
-              <Tooltip.Provider key={index}>
+            {((LANGUAGE_COMMANDS as any)[selectedLanguage]?.commands || []).map((cmd: any, cmdIndex: number) => (
+              <Tooltip.Provider key={cmdIndex}>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <button
@@ -235,8 +235,8 @@ export const EnhancedTerminal = memo(({ className, onCommand }: EnhancedTerminal
         {/* Command History */}
         {commandHistory.length > 0 && (
           <div className="mt-3 space-y-1 max-h-32 overflow-y-auto">
-            {commandHistory.slice(-5).map((cmd, index) => (
-              <div key={index} className="flex items-center gap-2 text-xs">
+            {commandHistory.slice(-5).map((cmd, historyIndex) => (
+              <div key={historyIndex} className="flex items-center gap-2 text-xs">
                 <span className="text-green-400 font-mono">$</span>
                 <span className="text-bolt-elements-textSecondary font-mono">{cmd}</span>
               </div>

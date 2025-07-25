@@ -1,6 +1,7 @@
 import { createScopedLogger } from '~/utils/logger';
 import { smartCache } from '~/lib/cache/SmartCacheManager';
-import { pluginSystem } from '~/lib/plugins/PluginSystem';
+
+// import pluginSystem from '~/lib/plugins/PluginSystem';
 
 const logger = createScopedLogger('SmartProjectTemplates');
 
@@ -73,7 +74,7 @@ export interface ProjectFeature {
 // ملفات المشروع
 export interface ProjectFile {
   path: string;
-  content: string;
+  _content: string;
   type: 'code' | 'config' | 'documentation' | 'asset';
   executable?: boolean;
 }
@@ -125,7 +126,7 @@ export interface ProjectCreationOptions {
 // نتيجة إنشاء المشروع
 export interface ProjectCreationResult {
   success: boolean;
-  projectPath: string;
+  _projectPath: string;
   filesCreated: string[];
   scriptsAvailable: string[];
   nextSteps: string[];
@@ -293,28 +294,28 @@ export class SmartProjectTemplates {
       logger.info('Creating project from template', { templateId, projectName: options.name });
 
       const startTime = Date.now();
-      const projectPath = options.directory || `./${options.name}`;
+      const _projectPath = options.directory || `./${options.name}`;
       const filesCreated: string[] = [];
 
       // إنشاء هيكل المشروع
-      await this.createProjectStructure(template, options, projectPath, filesCreated);
+      await this.createProjectStructure(template, options, _projectPath, filesCreated);
 
       // تطبيق التخصيصات
-      await this.applyCustomizations(template, options, projectPath);
+      await this.applyCustomizations(template, options, _projectPath);
 
       // تثبيت التبعيات
       if (!options.skipInstall) {
-        await this.installDependencies(template, projectPath);
+        await this.installDependencies(template, _projectPath);
       }
 
       // تهيئة Git
       if (options.initGit) {
-        await this.initializeGit(projectPath);
+        await this.initializeGit(_projectPath);
       }
 
       // إعداد CI/CD
       if (options.setupCI) {
-        await this.setupContinuousIntegration(template, projectPath);
+        await this.setupContinuousIntegration(template, _projectPath);
       }
 
       // تسجيل الاستخدام
@@ -324,7 +325,7 @@ export class SmartProjectTemplates {
 
       const result: ProjectCreationResult = {
         success: true,
-        projectPath,
+        _projectPath,
         filesCreated,
         scriptsAvailable: Object.keys(template.scripts),
         nextSteps: this.generateNextSteps(template, options),
@@ -338,7 +339,7 @@ export class SmartProjectTemplates {
       logger.error('Failed to create project', { templateId, error });
       return {
         success: false,
-        projectPath: '',
+        _projectPath: '',
         filesCreated: [],
         scriptsAvailable: [],
         nextSteps: [],
@@ -432,7 +433,7 @@ export class SmartProjectTemplates {
         baseFiles: [
           {
             path: 'package.json',
-            content: JSON.stringify(
+            _content: JSON.stringify(
               {
                 name: '{{projectName}}',
                 version: '1.0.0',
@@ -461,7 +462,7 @@ export class SmartProjectTemplates {
           },
           {
             path: 'src/App.tsx',
-            content: `import React from 'react';
+            _content: `import React from 'react';
 import './App.css';
 
 function App() {
@@ -480,7 +481,7 @@ export default App;`,
           },
           {
             path: 'src/main.tsx',
-            content: `import React from 'react';
+            _content: `import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
@@ -494,12 +495,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           },
           {
             path: 'index.html',
-            content: `<!DOCTYPE html>
+            _content: `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" _content="width=device-width, initial-scale=1.0" />
     <title>{{projectName}}</title>
   </head>
   <body>
@@ -511,7 +512,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           },
           {
             path: 'README.md',
-            content: `# {{projectName}}
+            _content: `# {{projectName}}
 
 {{projectDescription}}
 
@@ -575,7 +576,7 @@ npm run preview
         baseFiles: [
           {
             path: 'package.json',
-            content: JSON.stringify(
+            _content: JSON.stringify(
               {
                 name: '{{projectName}}',
                 version: '0.1.0',
@@ -607,7 +608,7 @@ npm run preview
           },
           {
             path: 'app/page.tsx',
-            content: `export default function Home() {
+            _content: `export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
@@ -625,7 +626,7 @@ npm run preview
           },
           {
             path: 'app/layout.tsx',
-            content: `import type { Metadata } from 'next';
+            _content: `import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -692,7 +693,7 @@ export default function RootLayout({
         baseFiles: [
           {
             path: 'package.json',
-            content: JSON.stringify(
+            _content: JSON.stringify(
               {
                 name: '{{projectName}}',
                 version: '1.0.0',
@@ -726,7 +727,7 @@ export default function RootLayout({
           },
           {
             path: 'src/index.ts',
-            content: `import express from 'express';
+            _content: `import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -883,24 +884,24 @@ app.listen(PORT, () => {
   private async createProjectStructure(
     template: ProjectTemplate,
     options: ProjectCreationOptions,
-    projectPath: string,
+    _projectPath: string,
     filesCreated: string[],
   ): Promise<void> {
     // محاكاة إنشاء الملفات
     for (const file of template.baseFiles) {
-      const content = this.processFileTemplate(file.content, {
+      const _content = this.processFileTemplate(file._content, {
         projectName: options.name,
         projectDescription: options.description || `مشروع ${options.name}`,
       });
 
-      filesCreated.push(`${projectPath}/${file.path}`);
+      filesCreated.push(`${_projectPath}/${file.path}`);
       logger.debug('File created', { path: file.path });
     }
   }
 
   // معالجة قالب الملف
-  private processFileTemplate(content: string, variables: Record<string, string>): string {
-    let processed = content;
+  private processFileTemplate(_content: string, variables: Record<string, string>): string {
+    let processed = _content;
 
     for (const [key, value] of Object.entries(variables)) {
       const placeholder = `{{${key}}}`;
@@ -914,7 +915,7 @@ app.listen(PORT, () => {
   private async applyCustomizations(
     template: ProjectTemplate,
     options: ProjectCreationOptions,
-    projectPath: string,
+    _projectPath: string,
   ): Promise<void> {
     // تطبيق الميزات المحددة
     for (const featureId of options.features) {
@@ -929,24 +930,24 @@ app.listen(PORT, () => {
   }
 
   // تثبيت التبعيات
-  private async installDependencies(template: ProjectTemplate, projectPath: string): Promise<void> {
-    logger.info('Installing dependencies', { projectPath });
+  private async installDependencies(template: ProjectTemplate, _projectPath: string): Promise<void> {
+    logger.info('Installing dependencies', { _projectPath });
 
     // محاكاة تثبيت التبعيات
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   // تهيئة Git
-  private async initializeGit(projectPath: string): Promise<void> {
-    logger.info('Initializing Git repository', { projectPath });
+  private async initializeGit(_projectPath: string): Promise<void> {
+    logger.info('Initializing Git repository', { _projectPath });
 
     // محاكاة تهيئة Git
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   // إعداد CI/CD
-  private async setupContinuousIntegration(template: ProjectTemplate, projectPath: string): Promise<void> {
-    logger.info('Setting up CI/CD', { projectPath });
+  private async setupContinuousIntegration(template: ProjectTemplate, _projectPath: string): Promise<void> {
+    logger.info('Setting up CI/CD', { _projectPath });
 
     // محاكاة إعداد CI/CD
     await new Promise((resolve) => setTimeout(resolve, 1000));

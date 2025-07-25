@@ -159,8 +159,8 @@ export class SmartCacheManager {
     this.currentMemorySize = 0;
 
     if (this.persistentCache) {
-      const keys = Object.keys(this.persistentCache);
-      keys.forEach((key) => {
+      const _keys = Object.keys(this.persistentCache);
+      _keys.forEach((key) => {
         if (key.startsWith('cache_')) {
           this.persistentCache!.removeItem(key);
         }

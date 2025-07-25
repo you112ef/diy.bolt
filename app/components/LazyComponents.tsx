@@ -65,11 +65,11 @@ export function LazyWrapper({ children, fallback, className }: LazyWrapperProps)
 }
 
 // HOC لتحسين المكونات
-export function withLazyLoading<T extends {}>(Component: ComponentType<T>, fallback?: React.ReactNode) {
+export function withLazyLoading<T extends {}>(component: ComponentType<T>, fallback?: React.ReactNode) {
   return function LazyComponent(props: T) {
     return (
       <LazyWrapper fallback={fallback}>
-        <Component {...props} />
+        {React.createElement(component, props)}
       </LazyWrapper>
     );
   };
