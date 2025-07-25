@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { Switch } from '@radix-ui/react-switch';
@@ -157,10 +157,12 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
-  // 1. Add a new state for showing the Extensions modal
+  // نافذة الملحقات
   const [showExtensions, setShowExtensions] = useState(false);
-  // 1. State for extensions management
-  const [extensions, setExtensions] = useState([]);
+  // نافذة المظهر
+  const [showTheme, setShowTheme] = useState(false);
+  // نافذة النماذج
+  const [showModels, setShowModels] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [installing, setInstalling] = useState(false);
   const [installMsg, setInstallMsg] = useState('');
@@ -440,369 +442,97 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   };
 
   return (
-    <RadixDialog.Root open={open}>
-      <RadixDialog.Portal>
-        <div className="fixed inset-0 flex items-center justify-center z-[100] modern-scrollbar">
-          <RadixDialog.Overlay asChild>
-            <motion.div
-              className="absolute inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-          </RadixDialog.Overlay>
-
-          <RadixDialog.Content
-            aria-describedby={undefined}
-            onEscapeKeyDown={handleClose}
-            onPointerDownOutside={handleClose}
-            className="relative z-[101]"
-          >
-            <motion.div
-              className={classNames(
-                'w-[1200px] h-[90vh]',
-                'bg-[#FAFAFA] dark:bg-[#0A0A0A]',
-                'rounded-2xl shadow-2xl',
-                'border border-[#E5E5E5] dark:border-[#1A1A1A]',
-                'flex flex-col overflow-hidden',
-                'relative',
-              )}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <BackgroundRays />
-              </div>
-              <div className="relative z-10 flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center space-x-4">
-                    {(activeTab || showTabManagement) && (
-                      <button
-                        onClick={handleBack}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
-                      >
-                        <div className="i-ph:arrow-left w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
-                      </button>
-                    )}
-                    <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {showTabManagement ? 'Tab Management' : activeTab ? TAB_LABELS[activeTab] : 'Control Panel'}
-                    </DialogTitle>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    {/* Mode Toggle */}
-                    <div className="flex items-center gap-2 min-w-[140px] border-r border-gray-200 dark:border-gray-800 pr-6">
-                      <AnimatedSwitch
-                        id="developer-mode"
-                        checked={developerMode}
-                        onCheckedChange={handleDeveloperModeChange}
-                        label={developerMode ? 'Developer Mode' : 'User Mode'}
-                      />
-                    </div>
-
-                    {/* Avatar and Dropdown */}
-                    <div className="border-l border-gray-200 dark:border-gray-800 pl-6">
-                      <AvatarDropdown onSelectTab={handleTabClick} />
-                    </div>
-
-                    {/* Close Button */}
-                    <button
-                      onClick={handleClose}
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
-                    >
-                      <div className="i-ph:x w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div
-                  className={classNames(
-                    'flex-1',
-                    'overflow-y-auto',
-                    'hover:overflow-y-auto',
-                    'scrollbar scrollbar-w-2',
-                    'scrollbar-track-transparent',
-                    'scrollbar-thumb-[#E5E5E5] hover:scrollbar-thumb-[#CCCCCC]',
-                    'dark:scrollbar-thumb-[#333333] dark:hover:scrollbar-thumb-[#444444]',
-                    'will-change-scroll',
-                    'touch-auto',
-                  )}
-                >
-                  <motion.div
-                    key={activeTab || 'home'}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-6"
-                  >
-                    {showTabManagement ? (
-                      <TabManagement />
-                    ) : activeTab ? (
-                      getTabComponent(activeTab)
-                    ) : (
-                      <div className="min-h-screen w-full flex flex-col items-center justify-start bg-[var(--bg-main)] py-12">
-                        <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                          {/* بطاقة الإعدادات الرئيسية */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--primary-light)' }}>
-                              <span className="i-ph:gear-six-bold text-4xl" style={{ color: 'var(--primary)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الإعدادات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">الملحقات</button>
-                              <button className="button w-full">المظهر</button>
-                              <button className="button w-full">النماذج</button>
-                            </div>
-                          </div>
-                          {/* كرر نفس النمط لبقية البطاقات (ميزات، حساب، إلخ) */}
-                          {/* بطاقة الميزات */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--secondary-light)' }}>
-                              <span className="i-ph:lightbulb-bold text-4xl" style={{ color: 'var(--secondary)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الميزات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              استكشف أحدث الميزات والتحديثات القادمة.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">الميزات الجديدة</button>
-                              <button className="button w-full">التحديثات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة الحساب */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--accent-light)' }}>
-                              <span className="i-ph:user-bold text-4xl" style={{ color: 'var(--accent)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الحساب
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              إدارة معلومات الحساب والإعدادات.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">الملف الشخصي</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة الإشعارات */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
-                              <span className="i-ph:bell-bold text-4xl" style={{ color: 'var(--info)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الإشعارات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              التحكم في إشعارات التطبيق والتنبيهات.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">إدارة الإشعارات</button>
-                              <button className="button w-full">التنبيهات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة الاتصالات */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
-                              <span className="i-ph:wifi-bold text-4xl" style={{ color: 'var(--success)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الاتصالات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              التحقق من حالة الاتصال وإدارة إعدادات الاتصال.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">الاتصالات</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة التصحيح */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--warning-light)' }}>
-                              <span className="i-ph:bug-bold text-4xl" style={{ color: 'var(--warning)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              التصحيح
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              التحقق من أخطاء النظام وإدارة أدوات التصحيح.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">التصحيح</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة السجلات */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
-                              <span className="i-ph:file-text-bold text-4xl" style={{ color: 'var(--info)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              السجلات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              مراقبة وتحليل سجلات النظام.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">السجلات</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة التحديثات */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
-                              <span className="i-ph:download-bold text-4xl" style={{ color: 'var(--success)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              التحديثات
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              التحقق من تحديثات التطبيق والمعلومات الأخرى.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">التحديثات</button>
-                              <button className="button w-full">المعلومات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة مدير المهام */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
-                              <span className="i-ph:list-bold text-4xl" style={{ color: 'var(--info)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              مدير المهام
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              التحكم في موارد النظام والعمليات.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">مدير المهام</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة المزودين */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--primary-light)' }}>
-                              <span className="i-ph:cloud-bold text-4xl" style={{ color: 'var(--primary)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              المزودين
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              إدارة المزودين الأماميين والخلفيين.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">المزودين</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                          {/* بطاقة الحالة الخدمة */}
-                          <div className="card flex flex-col items-center justify-center text-center">
-                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
-                              <span className="i-ph:server-bold text-4xl" style={{ color: 'var(--success)' }} />
-                            </div>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-                              الحالة الخدمة
-                            </h2>
-                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
-                              مراقبة وتحليل حالة الخدمات المستأجرة.
-                            </p>
-                            {/* أزرار أو روابط فرعية */}
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                              <button className="button w-full">الحالة الخدمة</button>
-                              <button className="button w-full">الإعدادات</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          </RadixDialog.Content>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg-main)] py-16">
+      <div className="w-full max-w-xl card flex flex-col items-center justify-center text-center shadow-lg">
+        <div className="icon mb-6" style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem' }}>
+          <span className="i-ph:gear-six-bold text-5xl" style={{ color: 'var(--primary)' }} />
         </div>
-      </RadixDialog.Portal>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+          الإعدادات
+        </h1>
+        <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
+          تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
+        </p>
+        <div className="flex flex-col gap-4 w-full">
+          <button className="button w-full" onClick={() => setShowExtensions(true)}>
+            <span className="i-ph:puzzle-piece-bold mr-2 text-xl" /> الملحقات
+          </button>
+          <button className="button w-full" onClick={() => setShowTheme(true)}>
+            <span className="i-ph:paint-brush-broad-bold mr-2 text-xl" /> المظهر
+          </button>
+          <button className="button w-full" onClick={() => setShowModels(true)}>
+            <span className="i-ph:cpu-bold mr-2 text-xl" /> النماذج
+          </button>
+        </div>
+      </div>
+      {/* نافذة الملحقات */}
       {showExtensions && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#181824] rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col relative">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col relative">
             <button
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
               onClick={() => setShowExtensions(false)}
             >
               <span className="i-ph:x text-xl" />
             </button>
-            <div className="flex items-center gap-2 p-6 border-b border-[#232336]">
-              <span className="i-ph:puzzle-piece text-2xl text-[#a78bfa]" />
-              <span className="text-lg font-bold text-white">إدارة ملحقات VSCode</span>
+            <div className="flex items-center gap-2 p-6 border-b border-[#ececec]">
+              <span className="i-ph:puzzle-piece-bold text-2xl text-[#8A5FFF]" />
+              <span className="text-lg font-bold text-black">إدارة ملحقات VSCode</span>
             </div>
-            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-              {/* Left: Extension Management UI */}
-              <div className="w-full md:w-1/3 bg-[#232336] p-4 flex flex-col gap-4 border-r border-[#232336]">
-                <div>
-                  <label className="block text-sm text-white mb-1">بحث أو تثبيت ملحق</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      className="flex-1 rounded-lg px-3 py-2 bg-[#181824] text-white border border-[#333] focus:ring-2 focus:ring-[#a78bfa] outline-none"
-                      placeholder="Publisher.Extension (مثال: ms-python.python)"
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      disabled={installing}
-                    />
-                    <button
-                      className="px-4 py-2 rounded-lg bg-[#a78bfa] text-white font-bold hover:bg-[#8A5FFF] transition-all"
-                      onClick={handleInstallExtension}
-                      disabled={installing || !searchTerm}
-                    >
-                      {installing ? '...جارٍ التثبيت' : 'تثبيت'}
-                    </button>
-                  </div>
-                  {installMsg && <div className="mt-2 text-xs text-green-400">{installMsg}</div>}
-                </div>
-                <div>
-                  <label className="block text-sm text-white mb-1">الملحقات المثبتة (تجريبي)</label>
-                  <div className="bg-[#181824] rounded-lg p-2 min-h-[80px] text-xs text-white/80">
-                    <span>سيتم عرض قائمة الملحقات المثبتة هنا قريبًا.</span>
-                  </div>
-                </div>
-              </div>
-              {/* Right: VSCode Web iframe */}
-              <div className="flex-1 h-full">
-                <iframe
-                  src="http://localhost:3001"
-                  title="VSCode Web"
-                  className="w-full h-full border-0 rounded-b-2xl"
-                />
-              </div>
+            <div className="flex-1 overflow-hidden flex items-center justify-center">
+              <iframe
+                src="http://localhost:3001"
+                title="VSCode Web"
+                className="w-full h-full border-0 rounded-b-2xl"
+              />
             </div>
           </div>
         </div>
       )}
-    </RadixDialog.Root>
+      {/* نافذة المظهر */}
+      {showTheme && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
+              onClick={() => setShowTheme(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <span className="i-ph:paint-brush-broad-bold text-3xl text-[#8A5FFF] mb-4" />
+            <h2 className="text-xl font-bold mb-2">تغيير المظهر</h2>
+            <p className="text-base mb-4 text-gray-600">اختر الوضع الليلي أو النهاري أو لون مخصص.</p>
+            {/* خيارات المظهر (ليلي/نهاري/مخصص) */}
+            <div className="flex gap-4">
+              <button className="button">ليلي</button>
+              <button className="button">نهاري</button>
+              <button className="button">مخصص</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* نافذة النماذج */}
+      {showModels && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
+            <button
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
+              onClick={() => setShowModels(false)}
+            >
+              <span className="i-ph:x text-xl" />
+            </button>
+            <span className="i-ph:cpu-bold text-3xl text-[#8A5FFF] mb-4" />
+            <h2 className="text-xl font-bold mb-2">إدارة النماذج</h2>
+            <p className="text-base mb-4 text-gray-600">إضافة أو إزالة أو تخصيص نماذج الذكاء الاصطناعي.</p>
+            {/* قائمة النماذج أو خيارات الإدارة */}
+            <div className="flex flex-col gap-2 w-full">
+              <button className="button w-full">إضافة نموذج جديد</button>
+              <button className="button w-full">إزالة نموذج</button>
+              <button className="button w-full">تخصيص</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
