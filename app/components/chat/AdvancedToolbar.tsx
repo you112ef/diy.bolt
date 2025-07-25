@@ -1,214 +1,173 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { classNames } from '~/utils/classNames';
-import { ADVANCED_TOOLS, getToolsByCategory, type AdvancedTool } from '~/lib/tools/advanced-tools';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import * as Popover from '@radix-ui/react-popover';
+
+interface AdvancedTool {
+  name: string;
+  description: string;
+  category: 'development' | 'build' | 'deploy' | 'test' | 'mobile' | 'ai';
+  icon: string;
+  command: string;
+  languages?: string[];
+  platforms?: string[];
+}
 
 interface AdvancedToolbarProps {
   onToolSelect: (tool: AdvancedTool) => void;
-  className?: string;
 }
 
-const TOOL_CATEGORIES = [
-  { id: 'development', name: 'تطوير', icon: 'i-ph:code-duotone', color: 'text-blue-500' },
-  { id: 'mobile', name: 'موبايل', icon: 'i-ph:device-mobile-duotone', color: 'text-green-500' },
-  { id: 'build', name: 'بناء', icon: 'i-ph:hammer-duotone', color: 'text-orange-500' },
-  { id: 'test', name: 'اختبار', icon: 'i-ph:test-tube-duotone', color: 'text-purple-500' },
-  { id: 'deploy', name: 'نشر', icon: 'i-ph:rocket-duotone', color: 'text-red-500' },
-  { id: 'ai', name: 'ذكاء اصطناعي', icon: 'i-ph:robot-duotone', color: 'text-cyan-500' },
+const tools: AdvancedTool[] = [
+  {
+    name: 'Code Formatter Pro',
+    description: 'تنسيق الكود تلقائياً مع أفضل الممارسات',
+    icon: '🎨',
+    category: 'development',
+    command: 'format-code',
+    languages: ['javascript', 'typescript', 'python', 'css'],
+    platforms: ['web', 'mobile']
+  },
+  {
+    name: 'Build Optimizer',
+    description: 'تحسين عملية البناء والأداء',
+    icon: '⚡',
+    category: 'build',
+    command: 'optimize-build',
+    languages: ['javascript', 'typescript'],
+    platforms: ['web']
+  },
+  {
+    name: 'AI Code Assistant',
+    description: 'مساعد ذكي للبرمجة والتطوير',
+    icon: '🤖',
+    category: 'ai',
+    command: 'ai-assist',
+    languages: ['javascript', 'typescript', 'python'],
+    platforms: ['web', 'mobile', 'desktop']
+  },
+  {
+    name: 'Deploy Manager',
+    description: 'إدارة النشر والتوزيع',
+    icon: '🚀',
+    category: 'deploy',
+    command: 'deploy-app',
+    platforms: ['web', 'mobile']
+  }
 ];
 
-export function AdvancedToolbar({ onToolSelect, className }: AdvancedToolbarProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isToolsOpen, setIsToolsOpen] = useState(false);
+const getToolsByCategory = (category: string): AdvancedTool[] => {
+  if (category === 'all') return tools;
+  return tools.filter(tool => tool.category === category);
+};
+
+export function AdvancedToolbar({ onToolSelect }: AdvancedToolbarProps) {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleToolClick = (tool: AdvancedTool) => {
+    console.log('Executing tool:', tool.command);
     onToolSelect(tool);
-    setIsToolsOpen(false);
-    setSelectedCategory(null);
   };
 
+  const categories = [
+    { id: 'all', name: 'الكل', icon: '📁' },
+    { id: 'development', name: 'التطوير', icon: '💻' },
+    { id: 'build', name: 'البناء', icon: '🔨' },
+    { id: 'ai', name: 'الذكاء الاصطناعي', icon: '🤖' },
+    { id: 'deploy', name: 'النشر', icon: '🚀' },
+    { id: 'test', name: 'الاختبار', icon: '🧪' },
+    { id: 'mobile', name: 'الموبايل', icon: '📱' }
+  ];
+
+  const filteredTools = getToolsByCategory(selectedCategory).filter(tool =>
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className={classNames('flex items-center gap-2', className)}>
-      {/* Quick Action Buttons */}
-      <div className="flex items-center gap-1">
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <button
-                onClick={() =>
-                  onToolSelect({
-                    name: 'Quick Build',
-                    description: 'بناء سريع للمشروع',
-                    category: 'build',
-                    icon: 'i-ph:lightning-duotone',
-                    command: 'quick-build',
-                  })
-                }
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform"
-              >
-                <div className="i-ph:lightning-duotone text-sm" />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded-md text-sm shadow-lg border border-bolt-elements-borderColor">
-                بناء سريع
-                <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+    <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          أدوات التطوير المتقدمة
+        </h3>
+        
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="البحث في الأدوات..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        />
 
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <button
-                onClick={() =>
-                  onToolSelect({
-                    name: 'AI Assistant',
-                    description: 'مساعد ذكي للبرمجة',
-                    category: 'ai',
-                    icon: 'i-ph:robot-duotone',
-                    command: 'ai-assist',
-                  })
-                }
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:scale-105 transition-transform"
-              >
-                <div className="i-ph:robot-duotone text-sm" />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded-md text-sm shadow-lg border border-bolt-elements-borderColor">
-                مساعد ذكي
-                <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <button
-                onClick={() =>
-                  onToolSelect({
-                    name: 'Android Builder',
-                    description: 'بناء تطبيق أندرويد',
-                    category: 'mobile',
-                    icon: 'i-logos:android-icon',
-                    command: 'android-build',
-                  })
-                }
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:scale-105 transition-transform"
-              >
-                <div className="i-logos:android-icon text-sm" />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded-md text-sm shadow-lg border border-bolt-elements-borderColor">
-                بناء أندرويد
-                <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+        {/* Categories */}
+        <div className="flex gap-2 flex-wrap mb-4">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={classNames(
+                'flex items-center gap-2 px-3 py-1 text-sm rounded-lg transition-colors',
+                selectedCategory === category.id
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              )}
+            >
+              <span>{category.icon}</span>
+              <span>{category.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="w-px h-6 bg-bolt-elements-borderColor" />
-
-      {/* Advanced Tools Menu */}
-      <Popover.Root open={isToolsOpen} onOpenChange={setIsToolsOpen}>
-        <Popover.Trigger asChild>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bolt-elements-background-depth-2 hover:bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor hover:border-bolt-elements-borderColorHover transition-all text-sm font-medium text-bolt-elements-textPrimary">
-            <div className="i-ph:toolbox-duotone text-lg" />
-            <span className="hidden md:inline">أدوات متقدمة</span>
+      {/* Tools Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {filteredTools.length === 0 ? (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="text-4xl mb-2">🔧</div>
+            <div>لا توجد أدوات تطابق البحث</div>
+          </div>
+        ) : (
+          filteredTools.map((tool, toolIndex) => (
             <div
-              className={classNames('i-ph:caret-down text-sm transition-transform', isToolsOpen ? 'rotate-180' : '')}
-            />
-          </button>
-        </Popover.Trigger>
-
-        <Popover.Portal>
-          <Popover.Content
-            className="bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor rounded-lg shadow-lg p-4 w-80 z-50"
-            sideOffset={5}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-bolt-elements-textPrimary">الأدوات المتقدمة</h3>
-                <button
-                  onClick={() => setIsToolsOpen(false)}
-                  className="text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary"
-                >
-                  <div className="i-ph:x text-lg" />
-                </button>
-              </div>
-
-              {/* Categories */}
-              <div className="grid grid-cols-2 gap-2">
-                {TOOL_CATEGORIES.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(selectedCategory === category.id ? null : category.id)}
-                    className={classNames(
-                      'flex items-center gap-2 p-3 rounded-lg border transition-all text-sm',
-                      selectedCategory === category.id
-                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                        : 'bg-bolt-elements-background-depth-3 border-bolt-elements-borderColor hover:border-bolt-elements-borderColorHover text-bolt-elements-textPrimary',
-                    )}
-                  >
-                    <div className={classNames(category.icon, 'text-lg', category.color)} />
-                    <span className="font-medium">{category.name}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Tools for Selected Category */}
-              {selectedCategory && (
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  <h4 className="text-sm font-medium text-bolt-elements-textSecondary">
-                    أدوات {TOOL_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
-                  </h4>
-                  {getToolsByCategory(selectedCategory).map((tool, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleToolClick(tool)}
-                      className="flex items-start gap-3 p-3 w-full text-left rounded-lg bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-1 border border-transparent hover:border-bolt-elements-borderColor transition-all"
-                    >
-                      <div className={classNames(tool.icon, 'text-lg mt-0.5 flex-shrink-0')} />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-bolt-elements-textPrimary text-sm">{tool.name}</div>
-                        <div className="text-xs text-bolt-elements-textSecondary mt-1 line-clamp-2">
-                          {tool.description}
-                        </div>
-                        {tool.languages && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {tool.languages.slice(0, 3).map((lang) => (
-                              <span
-                                key={lang}
-                                className="px-2 py-0.5 text-xs bg-bolt-elements-background-depth-1 text-bolt-elements-textSecondary rounded"
-                              >
-                                {lang}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  ))}
+              key={toolIndex}
+              onClick={() => handleToolClick(tool)}
+              className="p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 cursor-pointer transition-all hover:shadow-md"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                  <span className="text-lg">{tool.icon}</span>
                 </div>
-              )}
-
-              {!selectedCategory && (
-                <div className="text-center text-bolt-elements-textSecondary text-sm py-4">
-                  اختر فئة لعرض الأدوات المتاحة
+                <div>
+                  <h4 className="font-medium text-gray-900 text-sm">
+                    {tool.name}
+                  </h4>
+                  <p className="text-xs text-gray-600">
+                    {tool.description}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Languages */}
+              {tool.languages && tool.languages.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {tool.languages.slice(0, 3).map((lang: string, langIndex: number) => (
+                    <span
+                      key={langIndex}
+                      className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded"
+                    >
+                      {lang}
+                    </span>
+                  ))}
+                  {tool.languages.length > 3 && (
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                      +{tool.languages.length - 3}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
-            <Popover.Arrow className="fill-bolt-elements-background-depth-2" />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+          ))
+        )}
+      </div>
     </div>
   );
 }

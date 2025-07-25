@@ -17,9 +17,9 @@ export const activeAgentStore = atom<string | null>(null);
 // Helper functions
 export function createAgentFromModel(modelName: string, providerName: string, agentName: string): void {
   const agentKey = `${providerName}:${modelName}`;
-  const agentModels = agentModelsStore.get();
+  const _agentModels = agentModelsStore.get();
 
-  agentModels[agentKey] = {
+  _agentModels[agentKey] = {
     modelName,
     providerName,
     agentName,
@@ -27,17 +27,17 @@ export function createAgentFromModel(modelName: string, providerName: string, ag
     systemPrompt: generateSystemPrompt(agentName, modelName, providerName),
   };
 
-  agentModelsStore.set({ ...agentModels });
+  agentModelsStore.set({ ..._agentModels });
   activeAgentStore.set(agentKey);
 }
 
 export function removeAgent(modelName: string, providerName: string): void {
   const agentKey = `${providerName}:${modelName}`;
-  const agentModels = agentModelsStore.get();
+  const _agentModels = agentModelsStore.get();
 
-  if (agentModels[agentKey]) {
-    delete agentModels[agentKey];
-    agentModelsStore.set({ ...agentModels });
+  if (_agentModels[agentKey]) {
+    delete _agentModels[agentKey];
+    agentModelsStore.set({ ..._agentModels });
 
     // If this was the active agent, clear it
     if (activeAgentStore.get() === agentKey) {
@@ -48,9 +48,9 @@ export function removeAgent(modelName: string, providerName: string): void {
 
 export function toggleAgentMode(modelName: string, providerName: string): void {
   const agentKey = `${providerName}:${modelName}`;
-  const agentModels = agentModelsStore.get();
+  const _agentModels = agentModelsStore.get();
 
-  if (agentModels[agentKey]) {
+  if (_agentModels[agentKey]) {
     // Remove agent mode
     removeAgent(modelName, providerName);
   } else {
@@ -62,16 +62,16 @@ export function toggleAgentMode(modelName: string, providerName: string): void {
 
 export function isModelInAgentMode(modelName: string, providerName: string): boolean {
   const agentKey = `${providerName}:${modelName}`;
-  const agentModels = agentModelsStore.get();
+  const _agentModels = agentModelsStore.get();
 
-  return !!agentModels[agentKey]?.isAgentMode;
+  return !!_agentModels[agentKey]?.isAgentMode;
 }
 
 export function getAgentByModel(modelName: string, providerName: string): AgentModel | null {
   const agentKey = `${providerName}:${modelName}`;
-  const agentModels = agentModelsStore.get();
+  const _agentModels = agentModelsStore.get();
 
-  return agentModels[agentKey] || null;
+  return _agentModels[agentKey] || null;
 }
 
 export function setActiveAgent(modelName: string, providerName: string): void {
@@ -81,7 +81,7 @@ export function setActiveAgent(modelName: string, providerName: string): void {
 
 function generateAgentName(modelName: string, providerName: string): string {
   // Generate a friendly agent name based on model and provider
-  const modelParts = modelName.split('-');
+  const _modelParts = modelName.split('-');
   const providerParts = providerName.split(' ');
 
   if (modelName.includes('gpt')) {
