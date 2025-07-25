@@ -9,7 +9,14 @@ export const getSystemPrompt = (
     hasSelectedProject: boolean;
     credentials?: { anonKey?: string; supabaseUrl?: string };
   },
-) => `
+  agentSystemPrompt?: string,
+) => {
+  // If agent system prompt is provided, use it instead of the default
+  if (agentSystemPrompt) {
+    return agentSystemPrompt;
+  }
+
+  return `
 You are Bolt, an expert AI assistant and exceptional senior software developer with vast knowledge across multiple programming languages, frameworks, and best practices.
 
 <system_constraints>
@@ -697,6 +704,7 @@ Here are some examples of correct usage of artifacts:
   </example>
 </examples>
 `;
+};
 
 export const CONTINUE_PROMPT = stripIndents`
   Continue your prior response. IMPORTANT: Immediately begin from where you left off without any interruptions.

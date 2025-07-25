@@ -13,6 +13,9 @@ import { PROVIDER_LIST } from '~/utils/constants';
 import { Messages } from './Messages.client';
 import { SendButton } from './SendButton.client';
 import { APIKeyManager, getApiKeysFromCookies } from './APIKeyManager';
+import { AdvancedToolbar } from './AdvancedToolbar';
+import { ChatActionButtons } from './ChatActionButtons';
+import type { AdvancedTool } from '~/lib/tools/advanced-tools';
 import Cookies from 'js-cookie';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
@@ -140,6 +143,75 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         setQrModalOpen(true);
       }
     }, [expoUrl]);
+
+    // Tool handlers
+    const handleToolSelect = (tool: AdvancedTool) => {
+      let toolPrompt = '';
+
+      switch (tool.command) {
+        case 'quick-build':
+          toolPrompt = 'قم ببناء سريع للمشروع الحالي مع التحقق من جميع التبعيات والتحسينات المطلوبة';
+          break;
+        case 'ai-assist':
+          toolPrompt = 'ساعدني في تحسين الكود الحالي وإضافة الميزات المطلوبة باستخدام أفضل الممارسات';
+          break;
+        case 'android-build':
+          toolPrompt = 'أنشئ تطبيق أندرويد كامل مع جميع الملفات المطلوبة وإعدادات البناء';
+          break;
+        case 'create-react-app':
+          toolPrompt = 'أنشئ تطبيق React جديد مع TypeScript وجميع الإعدادات المطلوبة للتطوير الحديث';
+          break;
+        case 'nodejs-api':
+          toolPrompt = 'أنشئ API خادم Node.js مع Express وجميع الإعدادات الأمنية والأداء المطلوبة';
+          break;
+        case 'docker-build':
+          toolPrompt = 'أنشئ Dockerfile وإعدادات Docker Compose للمشروع مع التحسينات المطلوبة';
+          break;
+        default:
+          toolPrompt = `استخدم الأداة ${tool.name}: ${tool.description}`;
+      }
+
+      if (handleInputChange) {
+        handleInputChange({ target: { value: toolPrompt } } as any);
+      }
+    };
+
+    const handleChatAction = (action: string, data?: any) => {
+      let actionPrompt = '';
+
+      switch (action) {
+        case 'optimize-code':
+          actionPrompt = 'قم بتحليل الكود الحالي وتحسينه من ناحية الأداء والقراءة والأمان';
+          break;
+        case 'fix-bugs':
+          actionPrompt = 'ابحث عن الأخطاء المحتملة في الكود وقم بإصلاحها مع شرح السبب';
+          break;
+        case 'add-comments':
+          actionPrompt = 'أضف تعليقات شاملة ومفيدة للكود لتحسين فهمه وصيانته';
+          break;
+        case 'improve-performance':
+          actionPrompt = 'حلل الكود وقدم تحسينات للأداء مع قياسات ملموسة';
+          break;
+        case 'use-template':
+          actionPrompt = data || 'استخدم القالب المحدد';
+          break;
+        case 'voice-input':
+          // TODO: Implement voice input
+          console.log('Voice input requested');
+          return;
+        case 'file-upload':
+          handleFileUpload?.();
+          return;
+        case 'screenshot':
+          // TODO: Implement screenshot
+          console.log('Screenshot requested');
+          return;
+      }
+
+      if (handleInputChange) {
+        handleInputChange({ target: { value: actionPrompt } } as any);
+      }
+    };
 
     useEffect(() => {
       if (data) {
@@ -587,6 +659,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     </ClientOnly>
                     <div className="flex justify-between items-center text-sm p-4 pt-2">
                       <div className="flex gap-1 items-center">
+                        <AdvancedToolbar onToolSelect={handleToolSelect} />
+                        <div className="w-px h-6 bg-bolt-elements-borderColor mx-2" />
+                        <ChatActionButtons onAction={handleChatAction} />
+                        <div className="w-px h-6 bg-bolt-elements-borderColor mx-2" />
                         <IconButton title="Upload file" className="transition-all" onClick={() => handleFileUpload()}>
                           <div className="i-ph:paperclip text-xl"></div>
                         </IconButton>

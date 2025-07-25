@@ -1,6 +1,6 @@
 import type { Change } from 'diff';
 
-export type ActionType = 'file' | 'shell' | 'supabase';
+export type ActionType = 'file' | 'shell' | 'supabase' | 'build' | 'deploy' | 'test' | 'package' | 'docker' | 'android';
 
 export interface BaseAction {
   content: string;
@@ -30,7 +30,50 @@ export interface SupabaseAction extends BaseAction {
   projectId?: string;
 }
 
-export type BoltAction = FileAction | ShellAction | StartAction | BuildAction | SupabaseAction;
+export interface TestAction extends BaseAction {
+  type: 'test';
+  framework?: 'jest' | 'vitest' | 'cypress' | 'playwright';
+  testPath?: string;
+}
+
+export interface PackageAction extends BaseAction {
+  type: 'package';
+  operation: 'install' | 'uninstall' | 'update';
+  packageName?: string;
+  manager?: 'npm' | 'yarn' | 'pnpm' | 'bun';
+}
+
+export interface DockerAction extends BaseAction {
+  type: 'docker';
+  operation: 'build' | 'run' | 'stop' | 'compose';
+  imageName?: string;
+  containerName?: string;
+}
+
+export interface AndroidAction extends BaseAction {
+  type: 'android';
+  operation: 'build' | 'run' | 'debug' | 'release';
+  buildType?: 'debug' | 'release';
+  target?: 'emulator' | 'device';
+}
+
+export interface DeployAction extends BaseAction {
+  type: 'deploy';
+  platform: 'vercel' | 'netlify' | 'github' | 'firebase' | 'aws';
+  environment?: 'development' | 'staging' | 'production';
+}
+
+export type BoltAction =
+  | FileAction
+  | ShellAction
+  | StartAction
+  | BuildAction
+  | SupabaseAction
+  | TestAction
+  | PackageAction
+  | DockerAction
+  | AndroidAction
+  | DeployAction;
 
 export type BoltActionData = BoltAction | BaseAction;
 
