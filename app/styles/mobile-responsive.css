@@ -42,6 +42,21 @@
   /* Theme settings */
   --theme-font-size: 16px;
   --theme-border-radius: 8px;
+  
+  /* Mobile-specific variables */
+  --mobile-header-height: 56px;
+  --mobile-nav-height: 60px;
+  --mobile-tab-height: 40px;
+  --mobile-button-height: 40px;
+  --mobile-input-height: 40px;
+  --mobile-spacing-xs: 4px;
+  --mobile-spacing-sm: 8px;
+  --mobile-spacing-md: 12px;
+  --mobile-spacing-lg: 16px;
+  --mobile-spacing-xl: 20px;
+  --mobile-border-radius-sm: 6px;
+  --mobile-border-radius-md: 8px;
+  --mobile-border-radius-lg: 12px;
 }
 
 /* Dark theme overrides */
@@ -99,334 +114,455 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes theme-slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
+/* =====  تحسينات رئيسية للهواتف النقالة ===== */
 
-@keyframes theme-scale-in {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* تحسين العناصر الأساسية للموبايل */
+/* تصغير جميع العناصر للهواتف النقالة */
 @media (max-width: 768px) {
-  /* تحسين حجم النصوص */
-  .mobile-text-xs { font-size: 0.75rem; }
-  .mobile-text-sm { font-size: 0.875rem; }
-  .mobile-text-base { font-size: 1rem; }
-  .mobile-text-lg { font-size: 1.125rem; }
-  .mobile-text-xl { font-size: 1.25rem; }
+  /* تحسين Header */
+  header {
+    height: var(--mobile-header-height) !important;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
+    min-height: var(--mobile-header-height) !important;
+  }
   
-  /* تحسين الأزرار للموبايل */
-  .mobile-btn {
-    min-height: 44px; /* Apple's recommended touch target size */
-    min-width: 44px;
-    padding: 12px 16px;
-    font-size: 0.875rem;
-    border-radius: 8px;
+  header .text-2xl {
+    font-size: 1.25rem !important;
+  }
+  
+  header .text-xl {
+    font-size: 1rem !important;
+  }
+  
+  header .text-lg {
+    font-size: 0.875rem !important;
+  }
+  
+  header .text-sm {
+    font-size: 0.75rem !important;
+  }
+  
+  header button {
+    height: var(--mobile-button-height) !important;
+    padding: var(--mobile-spacing-xs) var(--mobile-spacing-sm) !important;
+    font-size: 0.75rem !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
+  }
+  
+  header .gap-2 {
+    gap: var(--mobile-spacing-xs) !important;
+  }
+  
+  header .gap-4 {
+    gap: var(--mobile-spacing-sm) !important;
+  }
+  
+  header .px-3 {
+    padding-left: var(--mobile-spacing-sm) !important;
+    padding-right: var(--mobile-spacing-sm) !important;
+  }
+  
+  header .py-1\.5 {
+    padding-top: var(--mobile-spacing-xs) !important;
+    padding-bottom: var(--mobile-spacing-xs) !important;
+  }
+  
+  /* تحسين Control Panel للهواتف النقالة */
+  .control-panel-mobile {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+  
+  [class*="w-[1200px]"] {
+    width: 100vw !important;
+  }
+  
+  [class*="h-[90vh]"] {
+    height: 100vh !important;
+  }
+  
+  [class*="rounded-2xl"] {
+    border-radius: 0 !important;
+  }
+  
+  /* تصغير padding و margins في Control Panel */
+  .control-panel-content {
+    padding: var(--mobile-spacing-md) !important;
+  }
+  
+  .px-6 {
+    padding-left: var(--mobile-spacing-md) !important;
+    padding-right: var(--mobile-spacing-md) !important;
+  }
+  
+  .py-4 {
+    padding-top: var(--mobile-spacing-sm) !important;
+    padding-bottom: var(--mobile-spacing-sm) !important;
+  }
+  
+  .p-6 {
+    padding: var(--mobile-spacing-md) !important;
+  }
+  
+  .gap-4 {
+    gap: var(--mobile-spacing-sm) !important;
+  }
+  
+  .gap-6 {
+    gap: var(--mobile-spacing-md) !important;
+  }
+  
+  .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-left: var(--mobile-spacing-sm) !important;
+  }
+  
+  /* تصغير النصوص */
+  .text-xl {
+    font-size: 1rem !important;
+    line-height: 1.375 !important;
+  }
+  
+  .text-lg {
+    font-size: 0.875rem !important;
+    line-height: 1.25 !important;
+  }
+  
+  .text-sm {
+    font-size: 0.75rem !important;
+    line-height: 1.125 !important;
+  }
+  
+  .text-xs {
+    font-size: 0.625rem !important;
+    line-height: 1 !important;
+  }
+  
+  /* تصغير الأزرار */
+  button {
+    min-height: var(--mobile-button-height) !important;
+    padding: var(--mobile-spacing-xs) var(--mobile-spacing-md) !important;
+    font-size: 0.75rem !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
+  }
+  
+  .w-8 {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+  
+  .h-8 {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+  
+  /* تصغير التبويبات في Control Panel */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .lg\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .sm\\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  /* تصغير Tab Tiles */
+  .aspect-\\[1\\.5\\/1\\] {
+    aspect-ratio: 1.2 / 1 !important;
+  }
+  
+  /* تصغير الأيقونات */
+  .w-4 {
+    width: 0.875rem !important;
+    height: 0.875rem !important;
+  }
+  
+  .h-4 {
+    width: 0.875rem !important;
+    height: 0.875rem !important;
+  }
+  
+  .w-5 {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+  
+  .h-5 {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+  
+  .w-6 {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+  
+  .h-6 {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+  
+  /* تحسين Switch Component */
+  .w-11 {
+    width: 2.25rem !important;
+  }
+  
+  .h-6 {
+    height: 1.25rem !important;
+  }
+  
+  /* تصغير المحتويات */
+  .min-w-\\[140px\\] {
+    min-width: 100px !important;
+  }
+  
+  /* تحسين الـ Scrollbar للهواتف النقالة */
+  .modern-scrollbar::-webkit-scrollbar {
+    width: 2px !important;
+    height: 2px !important;
+  }
+  
+  /* تحسين النماذج والحقول */
+  input, select, textarea {
+    min-height: var(--mobile-input-height) !important;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
+    font-size: 0.875rem !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
+  }
+  
+  /* تحسين البطاقات */
+  .card {
+    padding: var(--mobile-spacing-md) !important;
+    border-radius: var(--mobile-border-radius-md) !important;
+    margin-bottom: var(--mobile-spacing-sm) !important;
+  }
+  
+  /* تحسين القوائم */
+  .menu-item {
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
+    font-size: 0.875rem !important;
+    min-height: var(--mobile-tab-height) !important;
+  }
+  
+  /* تحسين الجداول */
+  table {
+    font-size: 0.75rem !important;
+  }
+  
+  th, td {
+    padding: var(--mobile-spacing-xs) var(--mobile-spacing-sm) !important;
+  }
+  
+  /* تحسين Modal Dialogs */
+  .modal-content {
+    margin: var(--mobile-spacing-sm) !important;
+    border-radius: var(--mobile-border-radius-md) !important;
+    max-height: calc(100vh - 2rem) !important;
+  }
+  
+  /* تحسين التنقل */
+  .navigation {
+    height: var(--mobile-nav-height) !important;
+    padding: var(--mobile-spacing-sm) !important;
+  }
+  
+  .nav-item {
+    padding: var(--mobile-spacing-sm) !important;
+    font-size: 0.75rem !important;
+    min-height: var(--mobile-button-height) !important;
+  }
+}
+
+/* تحسينات إضافية للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  :root {
+    --mobile-spacing-xs: 3px;
+    --mobile-spacing-sm: 6px;
+    --mobile-spacing-md: 10px;
+    --mobile-spacing-lg: 14px;
+    --mobile-spacing-xl: 18px;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  .text-xl {
+    font-size: 0.875rem !important;
+  }
+  
+  .text-lg {
+    font-size: 0.75rem !important;
+  }
+  
+  .text-sm {
+    font-size: 0.6875rem !important;
+  }
+  
+  button {
+    padding: 6px 10px !important;
+    font-size: 0.6875rem !important;
+  }
+  
+  .min-w-\\[100px\\] {
+    min-width: 80px !important;
+  }
+}
+
+/* تحسين الألوان للوضع المظلم والفاتح */
+@media (max-width: 768px) {
+  /* تحسين ألوان الخلفية */
+  .bg-\\[\\#FAFAFA\\] {
+    background-color: #fafafa !important;
+  }
+  
+  .dark\\:bg-\\[\\#0A0A0A\\] {
+    background-color: #0a0a0a !important;
+  }
+  
+  /* تحسين ألوان الحدود */
+  .border-\\[\\#E5E5E5\\] {
+    border-color: #e5e5e5 !important;
+  }
+  
+  .dark\\:border-\\[\\#1A1A1A\\] {
+    border-color: #1a1a1a !important;
+  }
+  
+  /* تحسين ألوان النصوص */
+  .text-gray-900 {
+    color: #111827 !important;
+  }
+  
+  .dark\\:text-white {
+    color: #ffffff !important;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  .dark\\:text-gray-400 {
+    color: #9ca3af !important;
+  }
+  
+  /* تحسين تأثيرات Hover للمس */
+  .hover\\:bg-purple-500\\/10:hover {
+    background-color: rgba(139, 92, 246, 0.1) !important;
+  }
+  
+  .dark\\:hover\\:bg-purple-500\\/20:hover {
+    background-color: rgba(139, 92, 246, 0.2) !important;
+  }
+  
+  .hover\\:text-purple-500:hover {
+    color: #8b5cf6 !important;
+  }
+  
+  /* إزالة تأثيرات Hover على الشاشات اللمسية */
+  @media (hover: none) {
+    button:hover,
+    .hover\\:bg-purple-500\\/10:hover,
+    .dark\\:hover\\:bg-purple-500\\/20:hover,
+    .hover\\:text-purple-500:hover {
+      background-color: initial !important;
+      color: initial !important;
+    }
+    
+    /* إضافة تأثيرات Active بدلاً من Hover */
+    button:active {
+      transform: scale(0.98) !important;
+      opacity: 0.8 !important;
+    }
+  }
+}
+
+/* تحسين الأداء للأجهزة المحمولة */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  .touch-optimized {
     touch-action: manipulation;
   }
   
-  .mobile-btn-sm {
-    min-height: 36px;
-    min-width: 36px;
-    padding: 8px 12px;
-    font-size: 0.75rem;
-    border-radius: 6px;
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
   
-  .mobile-btn-lg {
-    min-height: 52px;
-    min-width: 52px;
-    padding: 16px 24px;
-    font-size: 1rem;
-    border-radius: 10px;
+  /* تحسين التحريك */
+  .will-change-transform {
+    will-change: transform;
   }
   
-  /* تحسين الأيقونات للموبايل */
-  .mobile-icon-xs { width: 16px; height: 16px; }
-  .mobile-icon-sm { width: 20px; height: 20px; }
-  .mobile-icon-base { width: 24px; height: 24px; }
-  .mobile-icon-lg { width: 28px; height: 28px; }
-  .mobile-icon-xl { width: 32px; height: 32px; }
-  
-  /* تحسين المسافات للموبايل */
-  .mobile-p-1 { padding: 0.25rem; }
-  .mobile-p-2 { padding: 0.5rem; }
-  .mobile-p-3 { padding: 0.75rem; }
-  .mobile-p-4 { padding: 1rem; }
-  .mobile-p-6 { padding: 1.5rem; }
-  
-  .mobile-m-1 { margin: 0.25rem; }
-  .mobile-m-2 { margin: 0.5rem; }
-  .mobile-m-3 { margin: 0.75rem; }
-  .mobile-m-4 { margin: 1rem; }
-  
-  /* تحسين الشبكات للموبايل */
-  .mobile-grid-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-  .mobile-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mobile-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  
-  .mobile-gap-1 { gap: 0.25rem; }
-  .mobile-gap-2 { gap: 0.5rem; }
-  .mobile-gap-3 { gap: 0.75rem; }
-  .mobile-gap-4 { gap: 1rem; }
-}
-
-/* تحسين Control Panel للموبايل */
-@media (max-width: 768px) {
-  .control-panel-mobile {
-    position: fixed;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    border-radius: 12px;
-    overflow: hidden;
+  .will-change-scroll {
+    will-change: scroll-position;
   }
   
-  .control-panel-header-mobile {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--bolt-elements-borderColor);
-  }
-  
-  .control-panel-title-mobile {
-    font-size: 1.125rem;
-    font-weight: 600;
-  }
-  
-  .control-panel-tabs-mobile {
-    display: flex;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    border-bottom: 1px solid var(--bolt-elements-borderColor);
-  }
-  
-  .control-panel-tabs-mobile::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .control-panel-tab-mobile {
-    flex-shrink: 0;
-    padding: 12px 16px;
-    font-size: 0.875rem;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-  }
-  
-  .control-panel-tab-mobile.active {
-    border-bottom-color: #3b82f6;
-    color: #3b82f6;
-  }
-  
-  .control-panel-content-mobile {
-    padding: 16px;
-    overflow-y: auto;
-    flex: 1;
-  }
-  
-  .tool-grid-mobile {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .tool-card-mobile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 12px;
-    border: 1px solid var(--bolt-elements-borderColor);
-    border-radius: 8px;
-    background: var(--bolt-elements-background-depth-2);
-    transition: all 0.2s ease;
-    min-height: 80px;
-    text-align: center;
-  }
-  
-  .tool-card-mobile:hover {
-    background: var(--bolt-elements-background-depth-3);
-    border-color: var(--bolt-elements-borderColorHover);
-    transform: translateY(-1px);
-  }
-  
-  .tool-card-mobile:active {
-    transform: translateY(0);
-    scale: 0.98;
-  }
-  
-  .tool-icon-mobile {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
-  }
-  
-  .tool-name-mobile {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--bolt-elements-textPrimary);
-    line-height: 1.2;
+  /* تقليل Motion للأجهزة الضعيفة */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-/* تحسين النوافذ المنبثقة للموبايل */
-@media (max-width: 768px) {
-  .modal-mobile {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    border-radius: 12px;
-    overflow: hidden;
-    max-height: calc(100vh - 32px);
-  }
-  
-  .modal-header-mobile {
-    padding: 16px;
-    border-bottom: 1px solid var(--bolt-elements-borderColor);
-    display: flex;
-    align-items: center;
-    justify-content: between;
-  }
-  
-  .modal-content-mobile {
-    padding: 16px;
-    overflow-y: auto;
-    flex: 1;
-  }
-  
-  .modal-footer-mobile {
-    padding: 16px;
-    border-top: 1px solid var(--bolt-elements-borderColor);
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-}
-
-/* تحسين شريط الأدوات للموبايل */
-@media (max-width: 768px) {
-  .toolbar-mobile {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bolt-elements-background-depth-1);
-    border-top: 1px solid var(--bolt-elements-borderColor);
-    padding: 8px 16px 8px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 50;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  
-  .toolbar-item-mobile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    min-width: 60px;
-  }
-  
-  .toolbar-item-mobile:hover {
-    background: var(--bolt-elements-background-depth-2);
-  }
-  
-  .toolbar-icon-mobile {
-    font-size: 1.25rem;
-    color: var(--bolt-elements-textSecondary);
-  }
-  
-  .toolbar-item-mobile.active .toolbar-icon-mobile {
-    color: #3b82f6;
-  }
-  
-  .toolbar-label-mobile {
-    font-size: 0.625rem;
-    color: var(--bolt-elements-textSecondary);
-    text-align: center;
-    line-height: 1;
-  }
-  
-  .toolbar-item-mobile.active .toolbar-label-mobile {
-    color: #3b82f6;
-  }
-}
-
-/* تحسين قائمة الملفات للموبايل */
-@media (max-width: 768px) {
-  .file-tree-mobile {
-    padding: 8px;
-  }
-  
-  .file-item-mobile {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    min-height: 44px;
-  }
-  
-  .file-item-mobile:hover {
-    background: var(--bolt-elements-background-depth-2);
-  }
-  
-  .file-icon-mobile {
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .file-name-mobile {
-    font-size: 0.875rem;
-    color: var(--bolt-elements-textPrimary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-/* تحسين محرر الكود للموبايل */
+/* تحسين عرض الكود للموبايل */
 @media (max-width: 768px) {
   .code-editor-mobile {
-    font-size: 0.875rem;
-    line-height: 1.4;
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
   }
   
   .code-editor-mobile .cm-editor {
-    font-size: 0.875rem;
+    font-size: 0.75rem !important;
   }
   
   .code-editor-mobile .cm-gutters {
-    font-size: 0.75rem;
+    font-size: 0.625rem !important;
   }
   
   .code-editor-toolbar-mobile {
-    padding: 8px 12px;
+    padding: var(--mobile-spacing-xs) var(--mobile-spacing-sm) !important;
     border-bottom: 1px solid var(--bolt-elements-borderColor);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--mobile-spacing-xs) !important;
     overflow-x: auto;
   }
   
   .code-editor-action-mobile {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    gap: var(--mobile-spacing-xs) !important;
+    padding: var(--mobile-spacing-xs) var(--mobile-spacing-sm) !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
+    font-size: 0.625rem !important;
     white-space: nowrap;
     background: var(--bolt-elements-background-depth-2);
     border: 1px solid var(--bolt-elements-borderColor);
@@ -437,28 +573,29 @@
 @media (max-width: 768px) {
   .toast-mobile {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    padding: 12px 16px;
-    border-radius: 8px;
+    top: var(--mobile-spacing-md) !important;
+    left: var(--mobile-spacing-md) !important;
+    right: var(--mobile-spacing-md) !important;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
     background: var(--bolt-elements-background-depth-1);
     border: 1px solid var(--bolt-elements-borderColor);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 100;
+    font-size: 0.75rem !important;
   }
   
   .notification-mobile {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    gap: var(--mobile-spacing-sm) !important;
+    padding: var(--mobile-spacing-sm) !important;
+    border-radius: var(--mobile-border-radius-sm) !important;
+    margin-bottom: var(--mobile-spacing-xs) !important;
   }
   
   .notification-icon-mobile {
-    font-size: 1.25rem;
+    font-size: 1rem !important;
     flex-shrink: 0;
   }
   
@@ -467,13 +604,13 @@
   }
   
   .notification-title-mobile {
-    font-size: 0.875rem;
+    font-size: 0.75rem !important;
     font-weight: 500;
     margin-bottom: 2px;
   }
   
   .notification-message-mobile {
-    font-size: 0.75rem;
+    font-size: 0.625rem !important;
     color: var(--bolt-elements-textSecondary);
   }
 }
@@ -481,54 +618,54 @@
 /* تحسين الحقول والنماذج للموبايل */
 @media (max-width: 768px) {
   .form-mobile {
-    padding: 16px;
+    padding: var(--mobile-spacing-md) !important;
   }
   
   .input-mobile {
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
     border: 1px solid var(--bolt-elements-borderColor);
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: var(--mobile-border-radius-sm) !important;
+    font-size: 0.875rem !important;
     background: var(--bolt-elements-background-depth-2);
     color: var(--bolt-elements-textPrimary);
-    min-height: 44px;
+    min-height: var(--mobile-input-height) !important;
   }
   
   .input-mobile:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
   }
   
   .textarea-mobile {
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
     border: 1px solid var(--bolt-elements-borderColor);
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: var(--mobile-border-radius-sm) !important;
+    font-size: 0.875rem !important;
     background: var(--bolt-elements-background-depth-2);
     color: var(--bolt-elements-textPrimary);
-    min-height: 120px;
+    min-height: 100px !important;
     resize: vertical;
   }
   
   .select-mobile {
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md) !important;
     border: 1px solid var(--bolt-elements-borderColor);
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: var(--mobile-border-radius-sm) !important;
+    font-size: 0.875rem !important;
     background: var(--bolt-elements-background-depth-2);
     color: var(--bolt-elements-textPrimary);
-    min-height: 44px;
+    min-height: var(--mobile-input-height) !important;
   }
 }
 
 /* تحسين التخطيط العام للموبايل */
 @media (max-width: 768px) {
   .container-mobile {
-    padding: 16px;
+    padding: var(--mobile-spacing-md) !important;
     max-width: 100%;
   }
   
@@ -536,7 +673,7 @@
     position: fixed;
     top: 0;
     left: -100%;
-    width: 280px;
+    width: 250px !important;
     height: 100vh;
     background: var(--bolt-elements-background-depth-1);
     border-right: 1px solid var(--bolt-elements-borderColor);
@@ -567,22 +704,22 @@
   }
   
   .main-content-mobile {
-    padding-bottom: 80px; /* مساحة لشريط الأدوات السفلي */
+    padding-bottom: 60px !important; /* مساحة لشريط الأدوات السفلي */
   }
 }
 
 /* تأثيرات الحركة المحسّنة للموبايل */
 @media (max-width: 768px) {
   .fade-in-mobile {
-    animation: fadeInMobile 0.3s ease-out;
+    animation: fadeInMobile 0.2s ease-out;
   }
   
   .slide-up-mobile {
-    animation: slideUpMobile 0.3s ease-out;
+    animation: slideUpMobile 0.2s ease-out;
   }
   
   .scale-in-mobile {
-    animation: scaleInMobile 0.2s ease-out;
+    animation: scaleInMobile 0.15s ease-out;
   }
   
   @keyframes fadeInMobile {
@@ -596,7 +733,7 @@
   
   @keyframes slideUpMobile {
     from {
-      transform: translateY(20px);
+      transform: translateY(15px);
       opacity: 0;
     }
     to {
@@ -619,18 +756,124 @@
 
 /* تحسين الأداء للموبايل */
 @media (max-width: 768px) {
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  .touch-optimized {
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  
   .smooth-scroll {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* تحسين دقة النص */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* تحسينات خاصة لـ Control Panel */
+@media (max-width: 768px) {
+  /* جعل Control Panel يملأ الشاشة */
+  [role="dialog"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* تحسين Header في Control Panel */
+  .control-panel-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background: var(--theme-bg-primary) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  /* تحسين شبكة التبويبات */
+  .tabs-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--mobile-spacing-sm) !important;
+    padding: var(--mobile-spacing-md) !important;
+  }
+  
+  /* تحسين بطاقات التبويبات */
+  .tab-card {
+    aspect-ratio: 1.1 / 1 !important;
+    padding: var(--mobile-spacing-sm) !important;
+    border-radius: var(--mobile-border-radius-md) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  
+  .tab-card .icon {
+    font-size: 1.25rem !important;
+    margin-bottom: var(--mobile-spacing-xs) !important;
+  }
+  
+  .tab-card .title {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+  }
+  
+  .tab-card .description {
+    font-size: 0.625rem !important;
+    color: var(--theme-text-secondary) !important;
+    margin-top: var(--mobile-spacing-xs) !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+}
+
+/* تحسينات إضافية للشاشات الصغيرة جداً (أقل من 400px) */
+@media (max-width: 400px) {
+  :root {
+    --mobile-spacing-xs: 2px;
+    --mobile-spacing-sm: 4px;
+    --mobile-spacing-md: 8px;
+    --mobile-spacing-lg: 12px;
+    --mobile-spacing-xl: 16px;
+  }
+  
+  .tabs-grid {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+  
+  .tab-card {
+    aspect-ratio: 2.5 / 1 !important;
+    flex-direction: row !important;
+    text-align: left !important;
+    padding: var(--mobile-spacing-md) !important;
+  }
+  
+  .tab-card .icon {
+    font-size: 1rem !important;
+    margin-bottom: 0 !important;
+    margin-right: var(--mobile-spacing-sm) !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .tab-card .content {
+    flex: 1 !important;
+  }
+  
+  .tab-card .title {
+    font-size: 0.6875rem !important;
+  }
+  
+  .tab-card .description {
+    font-size: 0.5625rem !important;
+    -webkit-line-clamp: 1 !important;
   }
 }

@@ -157,6 +157,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Store values
   const tabConfiguration = useStore(tabConfigurationStore);
@@ -169,6 +170,18 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const { hasUnreadNotifications, unreadNotifications, markAllAsRead } = useNotifications();
   const { hasConnectionIssues, currentIssue, acknowledgeIssue } = useConnectionStatus();
   const { hasActiveWarnings, activeIssues, acknowledgeAllIssues } = useDebugStatus();
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Memoize the base tab configurations to avoid recalculation
   const baseTabConfig = useMemo(() => {
@@ -432,9 +445,11 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
           >
             <motion.div
               className={classNames(
-                'w-[1200px] h-[90vh]',
+                isMobile 
+                  ? 'w-screen h-screen max-w-screen max-h-screen rounded-none'
+                  : 'w-[1200px] h-[90vh] rounded-2xl',
                 'bg-[#FAFAFA] dark:bg-[#0A0A0A]',
-                'rounded-2xl shadow-2xl',
+                'shadow-2xl',
                 'border border-[#E5E5E5] dark:border-[#1A1A1A]',
                 'flex flex-col overflow-hidden',
                 'relative',
@@ -449,43 +464,76 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
               </div>
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center space-x-4">
+                <div className={classNames(
+                  'flex items-center justify-between border-b border-gray-200 dark:border-gray-700 control-panel-header',
+                  isMobile ? 'px-4 py-2' : 'px-6 py-4'
+                )}>
+                  <div className={classNames(
+                    'flex items-center',
+                    isMobile ? 'space-x-2' : 'space-x-4'
+                  )}>
                     {(activeTab || showTabManagement) && (
                       <button
                         onClick={handleBack}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
+                        className={classNames(
+                          'flex items-center justify-center rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200',
+                          isMobile ? 'w-7 h-7' : 'w-8 h-8'
+                        )}
                       >
-                        <div className="i-ph:arrow-left w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                        <div className={classNames(
+                          'i-ph:arrow-left text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors',
+                          isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'
+                        )} />
                       </button>
                     )}
-                    <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <DialogTitle className={classNames(
+                      'font-semibold text-gray-900 dark:text-white',
+                      isMobile ? 'text-lg' : 'text-xl'
+                    )}>
                       {showTabManagement ? 'Tab Management' : activeTab ? TAB_LABELS[activeTab] : 'Control Panel'}
                     </DialogTitle>
                   </div>
 
-                  <div className="flex items-center gap-6">
+                  <div className={classNames(
+                    'flex items-center',
+                    isMobile ? 'gap-3' : 'gap-6'
+                  )}>
                     {/* Mode Toggle */}
-                    <div className="flex items-center gap-2 min-w-[140px] border-r border-gray-200 dark:border-gray-800 pr-6">
+                    <div className={classNames(
+                      'flex items-center gap-2 border-r border-gray-200 dark:border-gray-800',
+                      isMobile ? 'min-w-[90px] pr-3' : 'min-w-[140px] pr-6'
+                    )}>
                       <AnimatedSwitch
                         id="developer-mode"
                         checked={developerMode}
                         onCheckedChange={handleDeveloperModeChange}
-                        label={developerMode ? 'Developer Mode' : 'User Mode'}
+                        label={isMobile 
+                          ? (developerMode ? 'Dev' : 'User')
+                          : (developerMode ? 'Developer Mode' : 'User Mode')
+                        }
                       />
                     </div>
 
-                    {/* Avatar and Dropdown */}
-                    <div className="border-l border-gray-200 dark:border-gray-800 pl-6">
-                      <AvatarDropdown onSelectTab={handleTabClick} />
-                    </div>
+                    {/* Avatar and Dropdown - Hide on mobile when space is limited */}
+                    {!isMobile && (
+                      <div className="border-l border-gray-200 dark:border-gray-800 pl-6">
+                        <AvatarDropdown onSelectTab={handleTabClick} />
+                      </div>
+                    )}
 
                     {/* Close Button */}
                     <button
                       onClick={handleClose}
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
+                      className={classNames(
+                        'flex items-center justify-center rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200',
+                        isMobile ? 'w-7 h-7' : 'w-8 h-8',
+                        !isMobile && 'border-l border-gray-200 dark:border-gray-800 pl-6'
+                      )}
                     >
-                      <div className="i-ph:x w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                      <div className={classNames(
+                        'i-ph:x text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors',
+                        isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'
+                      )} />
                     </button>
                   </div>
                 </div>
@@ -510,7 +558,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="p-6"
+                    className={isMobile ? 'p-4' : 'p-6'}
                   >
                     {showTabManagement ? (
                       <TabManagement />
@@ -518,14 +566,27 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                       getTabComponent(activeTab)
                     ) : (
                       <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative"
+                        className={classNames(
+                          'grid gap-4 relative tabs-grid',
+                          isMobile 
+                            ? 'grid-cols-2 gap-3' 
+                            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'
+                        )}
                         variants={gridLayoutVariants}
                         initial="hidden"
                         animate="visible"
                       >
                         <AnimatePresence mode="popLayout">
                           {(visibleTabs as TabWithDevType[]).map((tab: TabWithDevType) => (
-                            <motion.div key={tab.id} layout variants={itemVariants} className="aspect-[1.5/1]">
+                            <motion.div 
+                              key={tab.id} 
+                              layout 
+                              variants={itemVariants} 
+                              className={classNames(
+                                'tab-card',
+                                isMobile ? 'aspect-[1.2/1]' : 'aspect-[1.5/1]'
+                              )}
+                            >
                               <TabTile
                                 tab={tab}
                                 onClick={() => handleTabClick(tab.id as TabType)}
