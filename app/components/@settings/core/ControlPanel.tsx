@@ -159,6 +159,33 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const [showTabManagement, setShowTabManagement] = useState(false);
   // 1. Add a new state for showing the Extensions modal
   const [showExtensions, setShowExtensions] = useState(false);
+  // 1. State for extensions management
+  const [extensions, setExtensions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [installing, setInstalling] = useState(false);
+  const [installMsg, setInstallMsg] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+
+  // 2. Function to install extension
+  async function handleInstallExtension() {
+    if (!searchTerm) return;
+    setInstalling(true);
+    setInstallMsg('');
+    try {
+      const res = await fetch('/api/vscode/extension', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extensionId: searchTerm }),
+      });
+      const data = await res.json();
+      setInstallMsg(data.status === 'success' ? 'تم التثبيت بنجاح' : data.message || 'حدث خطأ');
+      setSearchTerm('');
+      // يمكنك تحديث قائمة الملحقات المثبتة هنا
+    } catch (e) {
+      setInstallMsg('حدث خطأ أثناء التثبيت');
+    }
+    setInstalling(false);
+  }
 
   // Store values
   const tabConfiguration = useStore(tabConfigurationStore);
@@ -572,13 +599,45 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
               <span className="i-ph:puzzle-piece text-2xl text-[#a78bfa]" />
               <span className="text-lg font-bold text-white">إدارة ملحقات VSCode</span>
             </div>
-            <div className="flex-1 overflow-hidden">
-              {/* VSCode Web iframe (replace the src with your openvscode-server/code-server URL) */}
-              <iframe
-                src="http://localhost:3001" // يمكنك تخصيص الرابط من الإعدادات لاحقًا
-                title="VSCode Web"
-                className="w-full h-full border-0 rounded-b-2xl"
-              />
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+              {/* Left: Extension Management UI */}
+              <div className="w-full md:w-1/3 bg-[#232336] p-4 flex flex-col gap-4 border-r border-[#232336]">
+                <div>
+                  <label className="block text-sm text-white mb-1">بحث أو تثبيت ملحق</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 rounded-lg px-3 py-2 bg-[#181824] text-white border border-[#333] focus:ring-2 focus:ring-[#a78bfa] outline-none"
+                      placeholder="Publisher.Extension (مثال: ms-python.python)"
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      disabled={installing}
+                    />
+                    <button
+                      className="px-4 py-2 rounded-lg bg-[#a78bfa] text-white font-bold hover:bg-[#8A5FFF] transition-all"
+                      onClick={handleInstallExtension}
+                      disabled={installing || !searchTerm}
+                    >
+                      {installing ? '...جارٍ التثبيت' : 'تثبيت'}
+                    </button>
+                  </div>
+                  {installMsg && <div className="mt-2 text-xs text-green-400">{installMsg}</div>}
+                </div>
+                <div>
+                  <label className="block text-sm text-white mb-1">الملحقات المثبتة (تجريبي)</label>
+                  <div className="bg-[#181824] rounded-lg p-2 min-h-[80px] text-xs text-white/80">
+                    <span>سيتم عرض قائمة الملحقات المثبتة هنا قريبًا.</span>
+                  </div>
+                </div>
+              </div>
+              {/* Right: VSCode Web iframe */}
+              <div className="flex-1 h-full">
+                <iframe
+                  src="http://localhost:3001"
+                  title="VSCode Web"
+                  className="w-full h-full border-0 rounded-b-2xl"
+                />
+              </div>
             </div>
           </div>
         </div>
