@@ -122,6 +122,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       clearSupabaseAlert,
       data,
       actionRunner,
+      isAgentMode = false,
+      onAgentModeToggle,
     },
     ref,
   ) => {
@@ -582,7 +584,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                                 )}
                                 onClick={(event) => {
                                   event.preventDefault();
-                                  onAgentModeToggle?.();
+                                  if (onAgentModeToggle) {
+                                    onAgentModeToggle();
+                                  }
                                 }}
                                 title={isAgentMode ? 'تعطيل وضع الذكاء الصناعي' : 'تفعيل وضع الذكاء الصناعي'}
                               >

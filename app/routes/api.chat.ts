@@ -91,13 +91,33 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             
             const agentResponse = await routeAgentRequest(agentContext);
             
-            // إرسال رد الذكاء الصناعي
-            dataStream.writeText(agentResponse);
+            // إضافة رد الذكاء الصناعي كرسالة جديدة
+            const responseMessage = {
+              id: generateId(),
+              role: 'assistant' as const,
+              content: agentResponse,
+            };
+            
+            // إنشاء options للـ streaming
+            const options: StreamingOptions = {
+              toolCallStreaming: false,
+            };
+            
+            const result = await streamText({
+              messages: [...messages, responseMessage],
+              env: context.cloudflare?.env,
+              options,
+              apiKeys,
+              providerSettings,
+              promptId,
+              contextOptimization,
+            });
+            
+            result.mergeIntoDataStream(dataStream);
             return;
           } catch (error) {
             logger.error('Agent mode error:', error);
             // في حالة الخطأ، استمر بالوضع التقليدي
-            dataStream.writeText('❌ حدث خطأ في وضع الذكاء الصناعي. التبديل للوضع التقليدي...\n\n');
           }
         }
 
