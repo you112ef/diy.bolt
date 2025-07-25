@@ -778,12 +778,6 @@
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: 100vw !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
   }
   
   /* تحسين Header في Control Panel */
@@ -875,5 +869,360 @@
   .tab-card .description {
     font-size: 0.5625rem !important;
     -webkit-line-clamp: 1 !important;
+  }
+}
+
+/* ===== تحسينات الهواتف النقالة - بدون تغيير التصميم ===== */
+
+/* تحسينات أساسية للهواتف النقالة */
+@media (max-width: 768px) {
+  /* تحسين الـ Control Panel للهواتف النقالة */
+  [role="dialog"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  /* تحسين شبكة التبويبات */
+  .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* تحسين أحجام التبويبات */
+  .aspect-\\[1\\.5\\/1\\] {
+    aspect-ratio: 1.2 / 1 !important;
+  }
+
+  /* تحسين النصوص للهواتف النقالة */
+  .text-xl {
+    font-size: 1.125rem !important;
+  }
+
+  .text-lg {
+    font-size: 1rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.8125rem !important;
+  }
+
+  /* تحسين المسافات */
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .py-4 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .gap-4 {
+    gap: 0.75rem !important;
+  }
+
+  .gap-6 {
+    gap: 1rem !important;
+  }
+
+  /* تحسين الأزرار */
+  button {
+    min-height: 44px !important; /* iOS touch target */
+    touch-action: manipulation;
+  }
+
+  /* تحسين Header للهواتف النقالة */
+  header {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  header .text-2xl {
+    font-size: 1.25rem !important;
+  }
+
+  header .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  /* تحسين الـ scrollbar للهواتف النقالة */
+  .modern-scrollbar::-webkit-scrollbar {
+    width: 2px !important;
+    height: 2px !important;
+  }
+
+  /* تحسين تأثيرات اللمس */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* السماح بالتحديد للنصوص والحقول */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
+  /* تحسين التحريك */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* تحسين دقة النص */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(1, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .p-6 {
+    padding: 0.75rem !important;
+  }
+
+  .text-xl {
+    font-size: 1rem !important;
+  }
+
+  .text-lg {
+    font-size: 0.9375rem !important;
+  }
+}
+
+/* تحسين الأداء للأجهزة المحمولة */
+@media (max-width: 768px) {
+  /* تقليل الحركة للأجهزة الضعيفة */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* إزالة تأثيرات Hover على الشاشات اللمسية */
+  @media (hover: none) {
+    .hover\\:bg-purple-500\\/10:hover,
+    .dark\\:hover\\:bg-purple-500\\/20:hover,
+    .hover\\:text-purple-500:hover,
+    .group-hover\\:text-purple-500,
+    .group-hover\\:bg-purple-100 {
+      background-color: initial !important;
+      color: initial !important;
+    }
+
+    /* إضافة تأثيرات Active للمس */
+    button:active,
+    [role="button"]:active {
+      transform: scale(0.98) !important;
+      opacity: 0.8 !important;
+      transition: all 0.1s ease !important;
+    }
+  }
+}
+
+/* تحسينات إضافية للتوافق */
+@media (max-width: 768px) {
+  /* تحسين Modal Backdrop */
+  .fixed.inset-0.bg-black\\/70 {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+
+  /* تحسين الحدود */
+  .border-\\[\\#E5E5E5\\] {
+    border-color: #e5e5e5 !important;
+  }
+
+  .dark\\:border-\\[\\#1A1A1A\\] {
+    border-color: #1a1a1a !important;
+  }
+
+  /* تحسين الخلفيات */
+  .bg-\\[\\#FAFAFA\\] {
+    background-color: #fafafa !important;
+  }
+
+  .dark\\:bg-\\[\\#0A0A0A\\] {
+    background-color: #0a0a0a !important;
+  }
+
+  /* تحسين الأيقونات */
+  .w-4.h-4 {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  .w-8.h-8 {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  /* تحسين Switch Component */
+  .w-11 {
+    width: 2.5rem !important;
+  }
+
+  .h-6 {
+    height: 1.5rem !important;
+  }
+}
+
+/* Theme CSS Variables للهواتف النقالة */
+@media (max-width: 768px) {
+  :root {
+    /* Mobile-specific variables */
+    --mobile-header-height: 56px;
+    --mobile-nav-height: 60px;
+    --mobile-tab-height: 44px;
+    --mobile-button-height: 44px;
+    --mobile-input-height: 44px;
+    --mobile-spacing-xs: 4px;
+    --mobile-spacing-sm: 8px;
+    --mobile-spacing-md: 12px;
+    --mobile-spacing-lg: 16px;
+    --mobile-spacing-xl: 20px;
+  }
+
+  /* استخدام المتغيرات في العناصر */
+  header {
+    height: var(--mobile-header-height) !important;
+  }
+
+  button, input, select, textarea {
+    min-height: var(--mobile-button-height) !important;
+  }
+
+  .nav-item, .menu-item {
+    min-height: var(--mobile-tab-height) !important;
+  }
+}
+
+/* تحسينات خاصة للعناصر التفاعلية */
+@media (max-width: 768px) {
+  /* تحسين التبويبات */
+  [class*="tab-card"],
+  [class*="TabTile"] {
+    min-height: 120px !important;
+    padding: 0.75rem !important;
+  }
+
+  /* تحسين الأيقونات في التبويبات */
+  [class*="tab-card"] .w-14,
+  [class*="TabTile"] .w-14 {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  [class*="tab-card"] .w-8,
+  [class*="TabTile"] .w-8 {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+
+  /* تحسين النصوص في التبويبات */
+  [class*="tab-card"] .text-\\[15px\\],
+  [class*="TabTile"] .text-\\[15px\\] {
+    font-size: 0.875rem !important;
+  }
+
+  [class*="tab-card"] .text-\\[13px\\],
+  [class*="TabTile"] .text-\\[13px\\] {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* تحسينات للحالات الخاصة */
+@media (max-width: 768px) {
+  /* تحسين AnimatedSwitch */
+  .min-w-\\[140px\\] {
+    min-width: 100px !important;
+  }
+
+  /* تحسين المسافات في Header */
+  .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-left: 0.5rem !important;
+  }
+
+  .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-left: 0.25rem !important;
+  }
+
+  /* تحسين الحدود الداخلية */
+  .border-r {
+    border-right-width: 1px !important;
+  }
+
+  .border-l {
+    border-left-width: 1px !important;
+  }
+
+  .pr-6 {
+    padding-right: 0.75rem !important;
+  }
+
+  .pl-6 {
+    padding-left: 0.75rem !important;
+  }
+}
+
+/* تحسينات للشاشات العريضة جداً (للأجهزة اللوحية في الوضع الأفقي) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* تحسين accessibility للهواتف النقالة */
+@media (max-width: 768px) {
+  /* تحسين focus visible */
+  *:focus-visible {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+  }
+
+  /* تحسين حجم النص للقراءة */
+  body {
+    font-size: 16px !important; /* منع التكبير التلقائي في iOS */
+  }
+
+  /* تحسين التباين */
+  @media (prefers-contrast: high) {
+    .border {
+      border-width: 2px !important;
+    }
+
+    .text-gray-500 {
+      color: #374151 !important;
+    }
+
+    .dark .text-gray-400 {
+      color: #d1d5db !important;
+    }
   }
 }
