@@ -517,31 +517,28 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     ) : activeTab ? (
                       getTabComponent(activeTab)
                     ) : (
-                      <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative"
-                        variants={gridLayoutVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <AnimatePresence mode="popLayout">
-                          {(visibleTabs as TabWithDevType[]).map((tab: TabWithDevType) => (
-                            <motion.div key={tab.id} layout variants={itemVariants} className="aspect-[1.5/1]">
-                              <TabTile
-                                tab={tab}
-                                onClick={() => handleTabClick(tab.id as TabType)}
-                                isActive={activeTab === tab.id}
-                                hasUpdate={getTabUpdateStatus(tab.id)}
-                                statusMessage={getStatusMessage(tab.id)}
-                                description={TAB_DESCRIPTIONS[tab.id]}
-                                isLoading={loadingTab === tab.id}
-                                className="h-full relative"
-                              >
-                                {BETA_TABS.has(tab.id) && <BetaLabel />}
-                              </TabTile>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-                      </motion.div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 w-full">
+                        {visibleTabs.map((tab: TabWithDevType) => (
+                          <div
+                            key={tab.id}
+                            className="relative bg-[#1c1c22] dark:bg-[#1c1c22] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-md hover:ring-2 ring-[#7c3aed]/40 transition-all duration-200"
+                          >
+                            {/* Icon */}
+                            <div className="w-6 h-6 mb-2 opacity-80">
+                              {/* Replace with actual icon component if available */}
+                              <span className={`i-ph:${tab.id}-fill`} />
+                            </div>
+                            <span className="text-sm">{TAB_LABELS[tab.id]}</span>
+                            {/* إشعار أو beta */}
+                            {tab.isNew && (
+                              <span className="absolute top-2 right-2 w-2 h-2 bg-[#9f7aea] rounded-full" />
+                            )}
+                            {BETA_TABS.has(tab.id) && (
+                              <span className="absolute top-2 left-2 text-xs text-[#9f7aea] bg-white/5 px-2 py-0.5 rounded-full">BETA</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </motion.div>
                 </div>

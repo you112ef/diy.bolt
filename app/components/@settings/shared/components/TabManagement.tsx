@@ -156,13 +156,13 @@ export const TabManagement = () => {
               <TbLayoutGrid className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-md font-medium text-bolt-elements-textPrimary">Tab Management</h4>
-              <p className="text-sm text-bolt-elements-textSecondary">Configure visible tabs and their order</p>
+              <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Tab Management</h4>
+              <p className="text-xs text-bolt-elements-textSecondary">Configure visible tabs and their order</p>
             </div>
           </div>
 
           {/* Search */}
-          <div className="relative w-64">
+          <div className="relative w-full max-w-xs">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <div className="i-ph:magnifying-glass w-4 h-4 text-gray-400" />
             </div>
@@ -185,12 +185,12 @@ export const TabManagement = () => {
         </div>
 
         {/* Tab Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Default Section Header */}
           {filteredTabs.some((tab) => DEFAULT_USER_TABS.includes(tab.id)) && (
             <div className="col-span-full flex items-center gap-2 mt-4 mb-2">
               <div className="i-ph:star-fill w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium text-bolt-elements-textPrimary">Default Tabs</span>
+              <span className="text-xs font-medium text-bolt-elements-textPrimary">Default Tabs</span>
             </div>
           )}
 
@@ -284,7 +284,7 @@ export const TabManagement = () => {
           {filteredTabs.some((tab) => OPTIONAL_USER_TABS.includes(tab.id)) && (
             <div className="col-span-full flex items-center gap-2 mt-8 mb-2">
               <div className="i-ph:plus-circle-fill w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium text-bolt-elements-textPrimary">Optional Tabs</span>
+              <span className="text-xs font-medium text-bolt-elements-textPrimary">Optional Tabs</span>
             </div>
           )}
 
