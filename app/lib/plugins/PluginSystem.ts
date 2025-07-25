@@ -3,9 +3,9 @@ import { smartCache } from '~/lib/cache/SmartCacheManager';
 
 // Simple EventEmitter implementation for browser compatibility
 class SimpleEventEmitter {
-  private events: Record<string, Function[]> = {};
+  private events: Record<string, ((...args: any[]) => any)[]> = {};
 
-  on(event: string, listener: Function) {
+  on(event: string, listener: (...args: any[]) => any) {
     if (!this.events[event]) {
       this.events[event] = [];
     }
@@ -13,7 +13,7 @@ class SimpleEventEmitter {
     this.events[event].push(listener);
   }
 
-  off(event: string, listener: Function) {
+  off(event: string, listener: (...args: any[]) => any) {
     if (!this.events[event]) {
       return;
     }
@@ -327,7 +327,7 @@ export class PluginSystem extends SimpleEventEmitter {
   }
 
   // تسجيل Hook
-  registerHook(hookName: string, callback: Function): void {
+  registerHook(hookName: string, callback: (...args: any[]) => any): void {
     if (!this.pluginHooks.has(hookName)) {
       this.pluginHooks.set(hookName, new Set());
     }
@@ -337,7 +337,7 @@ export class PluginSystem extends SimpleEventEmitter {
   }
 
   // إلغاء تسجيل Hook
-  unregisterHook(hookName: string, callback: Function): void {
+  unregisterHook(hookName: string, callback: (...args: any[]) => any): void {
     const hooks = this.pluginHooks.get(hookName);
 
     if (hooks) {
@@ -537,7 +537,7 @@ export class PluginSystem extends SimpleEventEmitter {
   private async cleanupPluginData(id: string): Promise<void> {
     try {
       // حذف البيانات المخزنة للـ Plugin
-      const keys = smartCache.getStats();
+      const _keys = smartCache.getStats();
 
       // يمكن إضافة منطق تنظيف أكثر تفصيلاً
 

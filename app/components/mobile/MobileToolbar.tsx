@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { classNames } from '~/utils/classNames';
 import { ControlPanel } from '~/components/control-panel/ControlPanel';
-import { AgentModeToggle } from '~/components/agent/AgentModeToggle';
+
+// import AgentModeToggle from '~/components/agent/AgentModeToggle';
 import { useAgentMode } from '~/lib/hooks/useAgentMode';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
@@ -165,13 +166,11 @@ export function MobileToolbar({ onExecuteCommand, currentModel, currentProvider 
       </div>
 
       {/* Control Panel */}
-      <ControlPanel
-        isOpen={isControlPanelOpen}
-        onClose={() => setIsControlPanelOpen(false)}
-        onExecuteCommand={onExecuteCommand}
-        currentModel={currentModel}
-        currentProvider={currentProvider}
-      />
+      {isControlPanelOpen && (
+        <ControlPanel
+          onClose={() => setIsControlPanelOpen(false)}
+        />
+      )}
 
       {/* Files Panel */}
       {activeItem === 'files' && (
