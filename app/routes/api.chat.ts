@@ -11,6 +11,7 @@ import type { ContextAnnotation, ProgressAnnotation } from '~/types/context';
 import { WORK_DIR } from '~/utils/constants';
 import { createSummary } from '~/lib/.server/llm/create-summary';
 import { extractPropertiesFromMessage } from '~/lib/.server/llm/utils';
+import { routeAgentRequest, type AgentContext } from '~/lib/agentRouter';
 
 export async function action(args: ActionFunctionArgs) {
   return chatAction(args);
@@ -37,11 +38,12 @@ function parseCookies(cookieHeader: string): Record<string, string> {
 }
 
 async function chatAction({ context, request }: ActionFunctionArgs) {
-  const { messages, files, promptId, contextOptimization, supabase } = await request.json<{
+  const { messages, files, promptId, contextOptimization, supabase, isAgentMode } = await request.json<{
     messages: Messages;
     files: any;
     promptId?: string;
     contextOptimization: boolean;
+    isAgentMode?: boolean;
     supabase?: {
       isConnected: boolean;
       hasSelectedProject: boolean;
@@ -76,6 +78,29 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
     const dataStream = createDataStream({
       async execute(dataStream) {
+        // إذا كان وضع الذكاء الصناعي مُفعّل، استخدم agentRouter
+        if (isAgentMode) {
+          try {
+            const agentContext: AgentContext = {
+              messages,
+              files,
+              apiKeys,
+              providerSettings,
+              contextOptimization,
+            };
+            
+            const agentResponse = await routeAgentRequest(agentContext);
+            
+            // إرسال رد الذكاء الصناعي
+            dataStream.writeText(agentResponse);
+            return;
+          } catch (error) {
+            logger.error('Agent mode error:', error);
+            // في حالة الخطأ، استمر بالوضع التقليدي
+            dataStream.writeText('❌ حدث خطأ في وضع الذكاء الصناعي. التبديل للوضع التقليدي...\n\n');
+          }
+        }
+
         const filePaths = getFilePaths(files || {});
         let filteredFiles: FileMap | undefined = undefined;
         let summary: string | undefined = undefined;

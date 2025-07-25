@@ -42,7 +42,7 @@ import { SupabaseConnection } from './SupabaseConnection';
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
 import { useStore } from '@nanostores/react';
-import { StickToBottom, useStickToBottomContext } from '~/lib/hooks';
+import { StickToBottom, useStickToBottomContext, useAgentMode } from '~/lib/hooks';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -82,6 +82,8 @@ interface BaseChatProps {
   clearDeployAlert?: () => void;
   data?: JSONValue[] | undefined;
   actionRunner?: ActionRunner;
+  isAgentMode?: boolean;
+  onAgentModeToggle?: () => void;
 }
 
 export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
@@ -568,21 +570,57 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     />
                     <ClientOnly>
                       {() => (
-                        <SendButton
-                          show={input.length > 0 || isStreaming || uploadedFiles.length > 0}
-                          isStreaming={isStreaming}
-                          disabled={!providerList || providerList.length === 0}
-                          onClick={(event) => {
-                            if (isStreaming) {
-                              handleStop?.();
-                              return;
-                            }
+                        <>
+                          <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                              <button
+                                className={classNames(
+                                  'absolute flex justify-center items-center top-[18px] right-[60px] p-1 rounded-md w-[34px] h-[34px] transition-all',
+                                  isAgentMode
+                                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                                    : 'bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-4 text-bolt-elements-textSecondary'
+                                )}
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  onAgentModeToggle?.();
+                                }}
+                                title={isAgentMode ? 'تعطيل وضع الذكاء الصناعي' : 'تفعيل وضع الذكاء الصناعي'}
+                              >
+                                <div className="text-lg">
+                                  {isAgentMode ? (
+                                    <div className="i-ph:robot text-white"></div>
+                                  ) : (
+                                    <div className="i-ph:chat-circle text-bolt-elements-textSecondary"></div>
+                                  )}
+                                </div>
+                              </button>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content
+                                className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded text-sm"
+                                sideOffset={5}
+                              >
+                                {isAgentMode ? 'وضع الذكاء الصناعي (مُفعّل)' : 'وضع المساعد التقليدي (مُفعّل)'}
+                                <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                          <SendButton
+                            show={input.length > 0 || isStreaming || uploadedFiles.length > 0}
+                            isStreaming={isStreaming}
+                            disabled={!providerList || providerList.length === 0}
+                            onClick={(event) => {
+                              if (isStreaming) {
+                                handleStop?.();
+                                return;
+                              }
 
-                            if (input.length > 0 || uploadedFiles.length > 0) {
-                              handleSendMessage?.(event);
-                            }
-                          }}
-                        />
+                              if (input.length > 0 || uploadedFiles.length > 0) {
+                                handleSendMessage?.(event);
+                              }
+                            }}
+                          />
+                        </>
                       )}
                     </ClientOnly>
                     <div className="flex justify-between items-center text-sm p-4 pt-2">
