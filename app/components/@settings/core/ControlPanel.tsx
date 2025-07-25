@@ -38,6 +38,7 @@ import CloudProvidersTab from '~/components/@settings/tabs/providers/cloud/Cloud
 import ServiceStatusTab from '~/components/@settings/tabs/providers/status/ServiceStatusTab';
 import LocalProvidersTab from '~/components/@settings/tabs/providers/local/LocalProvidersTab';
 import TaskManagerTab from '~/components/@settings/tabs/task-manager/TaskManagerTab';
+import McpTab from '~/components/@settings/tabs/mcp/McpTab';
 
 interface ControlPanelProps {
   open: boolean;
@@ -81,10 +82,11 @@ const TAB_DESCRIPTIONS: Record<TabType, string> = {
   update: 'Check for updates and release notes',
   'task-manager': 'Monitor system resources and processes',
   'tab-management': 'Configure visible tabs and their order',
+  'mcp': 'Configure Model Context Protocol servers and tools',
 };
 
 // Beta status for experimental features
-const BETA_TABS = new Set<TabType>(['task-manager', 'service-status', 'update', 'local-providers']);
+const BETA_TABS = new Set<TabType>(['task-manager', 'service-status', 'update', 'local-providers', 'mcp']);
 
 const BetaLabel = () => (
   <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20">
@@ -336,6 +338,8 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
         return <CloudProvidersTab />;
       case 'local-providers':
         return <LocalProvidersTab />;
+      case 'mcp':
+        return <McpTab />;
       case 'connection':
         return <ConnectionsTab />;
       case 'debug':
@@ -527,7 +531,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                       className={classNames(
                         'flex items-center justify-center rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200',
                         isMobile ? 'w-7 h-7' : 'w-8 h-8',
-                        !isMobile && 'border-l border-gray-200 dark:border-gray-800 pl-6'
+                        !isMobile ? 'border-l border-gray-200 dark:border-gray-800 pl-6' : ''
                       )}
                     >
                       <div className={classNames(
