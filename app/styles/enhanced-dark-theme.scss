@@ -1,0 +1,304 @@
+/* Enhanced Dark Theme - Modern Design System */
+:root[data-theme='dark'],
+:root[data-enhanced-dark='true'] {
+  /* ========== أساسيات الألوان ========== */
+  
+  /* الخلفيات الرئيسية */
+  --enhanced-bg-primary: #0e0e11;
+  --enhanced-bg-secondary: #1a1a1f;
+  --enhanced-bg-tertiary: #1f1f24;
+  --enhanced-bg-card: #1f1f24;
+  --enhanced-bg-modal: rgba(31, 31, 36, 0.95);
+  --enhanced-bg-overlay: rgba(14, 14, 17, 0.85);
+  
+  /* الحدود والتباينات */
+  --enhanced-border-subtle: rgba(255, 255, 255, 0.05);
+  --enhanced-border-medium: rgba(255, 255, 255, 0.1);
+  --enhanced-border-strong: rgba(255, 255, 255, 0.15);
+  --enhanced-border-accent: rgba(139, 92, 246, 0.3);
+  
+  /* النصوص */
+  --enhanced-text-primary: #ffffff;
+  --enhanced-text-secondary: rgba(255, 255, 255, 0.8);
+  --enhanced-text-tertiary: rgba(255, 255, 255, 0.6);
+  --enhanced-text-muted: rgba(255, 255, 255, 0.4);
+  
+  /* ألوان Agent Mode */
+  --enhanced-agent-primary: #8b5cf6;
+  --enhanced-agent-secondary: rgba(139, 92, 246, 0.2);
+  --enhanced-agent-accent: rgba(139, 92, 246, 0.1);
+  --enhanced-agent-glow: rgba(139, 92, 246, 0.3);
+  
+  /* الظلال */
+  --enhanced-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --enhanced-shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --enhanced-shadow-glow: 0 0 20px rgba(139, 92, 246, 0.2);
+  
+  /* الأزرار */
+  --enhanced-btn-primary-bg: var(--enhanced-agent-primary);
+  --enhanced-btn-primary-hover: #a855f7;
+  --enhanced-btn-secondary-bg: var(--enhanced-bg-tertiary);
+  --enhanced-btn-secondary-hover: rgba(255, 255, 255, 0.1);
+  
+  /* ========== تحديث متغيرات Bolt الموجودة ========== */
+  
+  /* الخلفيات */
+  --bolt-elements-bg-depth-1: var(--enhanced-bg-primary);
+  --bolt-elements-bg-depth-2: var(--enhanced-bg-secondary);
+  --bolt-elements-bg-depth-3: var(--enhanced-bg-tertiary);
+  --bolt-elements-bg-depth-4: var(--enhanced-bg-card);
+  
+  /* الحدود */
+  --bolt-elements-borderColor: var(--enhanced-border-subtle);
+  --bolt-elements-borderColorActive: var(--enhanced-agent-primary);
+  
+  /* النصوص */
+  --bolt-elements-textPrimary: var(--enhanced-text-primary);
+  --bolt-elements-textSecondary: var(--enhanced-text-secondary);
+  --bolt-elements-textTertiary: var(--enhanced-text-tertiary);
+  
+  /* الأزرار */
+  --bolt-elements-button-primary-background: var(--enhanced-agent-secondary);
+  --bolt-elements-button-primary-backgroundHover: var(--enhanced-agent-accent);
+  --bolt-elements-button-primary-text: var(--enhanced-agent-primary);
+  
+  --bolt-elements-button-secondary-background: var(--enhanced-bg-tertiary);
+  --bolt-elements-button-secondary-backgroundHover: var(--enhanced-btn-secondary-hover);
+  --bolt-elements-button-secondary-text: var(--enhanced-text-primary);
+  
+  /* الآيتمز */
+  --bolt-elements-item-backgroundDefault: transparent;
+  --bolt-elements-item-backgroundActive: var(--enhanced-bg-tertiary);
+  --bolt-elements-item-backgroundAccent: var(--enhanced-agent-accent);
+  --bolt-elements-item-contentDefault: var(--enhanced-text-secondary);
+  --bolt-elements-item-contentActive: var(--enhanced-text-primary);
+  --bolt-elements-item-contentAccent: var(--enhanced-agent-primary);
+  
+  /* كود الألوان */
+  --bolt-elements-code-background: var(--enhanced-bg-tertiary);
+  --bolt-elements-code-text: var(--enhanced-text-primary);
+  
+  /* المحادثات */
+  --bolt-elements-messages-background: var(--enhanced-bg-secondary);
+  --bolt-elements-messages-inlineCode-background: var(--enhanced-bg-tertiary);
+  --bolt-elements-messages-inlineCode-text: var(--enhanced-text-primary);
+  
+  /* الأيقونات */
+  --bolt-elements-icon-primary: var(--enhanced-text-primary);
+  --bolt-elements-icon-secondary: var(--enhanced-text-secondary);
+  --bolt-elements-icon-tertiary: var(--enhanced-text-tertiary);
+  
+  /* Terminal */
+  --bolt-terminal-background: var(--enhanced-bg-tertiary);
+  --bolt-terminal-foreground: var(--enhanced-text-primary);
+  
+  /* Scrollbar */
+  --modern-scrollbar-thumb-background: rgba(255, 255, 255, 0.1);
+  --modern-scrollbar-thumb-backgroundHover: rgba(255, 255, 255, 0.2);
+}
+
+/* ========== مكونات مخصصة محسنة ========== */
+
+/* البطاقات */
+.enhanced-card {
+  background: var(--enhanced-bg-card);
+  border: 1px solid var(--enhanced-border-subtle);
+  border-radius: 1rem;
+  box-shadow: var(--enhanced-shadow-card);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  min-width: min(300px, 100%);
+  
+  &:hover {
+    border-color: var(--enhanced-border-medium);
+    box-shadow: var(--enhanced-shadow-card), var(--enhanced-shadow-glow);
+    transform: translateY(-2px);
+  }
+  
+  &.agent-active {
+    border-color: var(--enhanced-agent-primary);
+    box-shadow: var(--enhanced-shadow-card), 0 0 30px rgba(139, 92, 246, 0.3);
+  }
+}
+
+/* الشبكة المرنة */
+.enhanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+/* الأزرار المحسنة */
+.enhanced-button {
+  background: var(--enhanced-btn-secondary-bg);
+  border: 1px solid var(--enhanced-border-subtle);
+  border-radius: 0.75rem;
+  color: var(--enhanced-text-primary);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: var(--enhanced-btn-secondary-hover);
+    border-color: var(--enhanced-border-medium);
+    transform: translateY(-1px);
+  }
+  
+  &.primary {
+    background: var(--enhanced-agent-primary);
+    border-color: var(--enhanced-agent-primary);
+    color: white;
+    
+    &:hover {
+      background: var(--enhanced-btn-primary-hover);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+  }
+  
+  &.compact {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* الشارات */
+.enhanced-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  
+  &.beta {
+    background: rgba(234, 88, 12, 0.2);
+    color: #fb923c;
+    border: 1px solid rgba(234, 88, 12, 0.3);
+  }
+  
+  &.active {
+    background: var(--enhanced-agent-accent);
+    color: var(--enhanced-agent-primary);
+    border: 1px solid var(--enhanced-agent-primary);
+  }
+  
+  &.new {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+}
+
+/* الأيقونات المحسنة */
+.enhanced-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: var(--enhanced-bg-tertiary);
+  border: 1px solid var(--enhanced-border-subtle);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--enhanced-border-medium);
+    transform: scale(1.05);
+  }
+  
+  &.agent-icon {
+    background: var(--enhanced-agent-accent);
+    border-color: var(--enhanced-agent-primary);
+    color: var(--enhanced-agent-primary);
+  }
+}
+
+/* المودالز المحسنة */
+.enhanced-modal {
+  background: var(--enhanced-bg-modal);
+  border: 1px solid var(--enhanced-border-medium);
+  border-radius: 1.5rem;
+  box-shadow: var(--enhanced-shadow-modal);
+  backdrop-filter: blur(20px);
+  
+  .modal-header {
+    border-bottom: 1px solid var(--enhanced-border-subtle);
+    padding: 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .modal-content {
+    padding: 1.5rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid var(--enhanced-border-subtle);
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+}
+
+/* تصميم متجاوب للنصوص */
+.enhanced-text {
+  &.title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--enhanced-text-primary);
+  }
+  
+  &.subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 500;
+    color: var(--enhanced-text-secondary);
+  }
+  
+  &.body {
+    font-size: clamp(0.875rem, 2vw, 0.95rem);
+    color: var(--enhanced-text-secondary);
+    line-height: 1.6;
+  }
+  
+  &.caption {
+    font-size: clamp(0.75rem, 1.5vw, 0.825rem);
+    color: var(--enhanced-text-tertiary);
+  }
+}
+
+/* الحواف المرنة للشاشات الصغيرة */
+@media (max-width: 640px) {
+  .enhanced-card {
+    border-radius: 0.75rem;
+    min-width: 100%;
+  }
+  
+  .enhanced-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8rem;
+    border-radius: 0.625rem;
+    
+    &.compact {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+  }
+  
+  .enhanced-modal {
+    border-radius: 1rem;
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+}
