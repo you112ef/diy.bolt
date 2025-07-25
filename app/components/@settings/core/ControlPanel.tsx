@@ -546,36 +546,197 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     ) : activeTab ? (
                       getTabComponent(activeTab)
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 w-full">
-                        {visibleTabs.map((tab: TabWithDevType) => (
-                          <div
-                            key={tab.id}
-                            className="relative bg-gradient-to-br from-[#232336] to-[#181824] dark:from-[#232336] dark:to-[#181824] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-lg hover:ring-2 ring-[#a78bfa]/50 transition-all duration-200"
-                          >
-                            {/* Icon */}
-                            <div className="w-6 h-6 mb-2 opacity-90 text-[#a78bfa] dark:text-[#c4b5fd]">
-                              {/* Replace with actual icon component if available */}
-                              <span className={`i-ph:${tab.id}-fill`} />
+                      <div className="min-h-screen w-full flex flex-col items-center justify-start bg-[var(--bg-main)] py-12">
+                        <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                          {/* بطاقة الإعدادات الرئيسية */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--primary-light)' }}>
+                              <span className="i-ph:gear-six-bold text-4xl" style={{ color: 'var(--primary)' }} />
                             </div>
-                            <span className="text-sm font-semibold text-white/90 dark:text-white/95 drop-shadow-sm">{TAB_LABELS[tab.id]}</span>
-                            {/* إشعار أو beta */}
-                            {tab.isNew && (
-                              <span className="absolute top-2 right-2 w-2 h-2 bg-[#c084fc] shadow-lg rounded-full" />
-                            )}
-                            {BETA_TABS.has(tab.id) && (
-                              <span className="absolute top-2 left-2 text-xs text-[#f3e8ff] bg-[#a78bfa]/80 px-2 py-0.5 rounded-full shadow">BETA</span>
-                            )}
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الإعدادات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">الملحقات</button>
+                              <button className="button w-full">المظهر</button>
+                              <button className="button w-full">النماذج</button>
+                            </div>
                           </div>
-                        ))}
-                        {/* Extensions Card */}
-                        <div
-                          className="relative bg-gradient-to-br from-[#232336] to-[#181824] dark:from-[#232336] dark:to-[#181824] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-lg hover:ring-2 ring-[#a78bfa]/50 transition-all duration-200 cursor-pointer"
-                          onClick={() => setShowExtensions(true)}
-                        >
-                          <div className="w-6 h-6 mb-2 opacity-90 text-[#a78bfa] dark:text-[#c4b5fd]">
-                            <span className="i-ph:puzzle-piece" />
+                          {/* كرر نفس النمط لبقية البطاقات (ميزات، حساب، إلخ) */}
+                          {/* بطاقة الميزات */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--secondary-light)' }}>
+                              <span className="i-ph:lightbulb-bold text-4xl" style={{ color: 'var(--secondary)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الميزات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              استكشف أحدث الميزات والتحديثات القادمة.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">الميزات الجديدة</button>
+                              <button className="button w-full">التحديثات</button>
+                            </div>
                           </div>
-                          <span className="text-sm font-semibold text-white/90 dark:text-white/95 drop-shadow-sm">الملحقات</span>
+                          {/* بطاقة الحساب */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--accent-light)' }}>
+                              <span className="i-ph:user-bold text-4xl" style={{ color: 'var(--accent)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الحساب
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              إدارة معلومات الحساب والإعدادات.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">الملف الشخصي</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة الإشعارات */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
+                              <span className="i-ph:bell-bold text-4xl" style={{ color: 'var(--info)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الإشعارات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              التحكم في إشعارات التطبيق والتنبيهات.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">إدارة الإشعارات</button>
+                              <button className="button w-full">التنبيهات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة الاتصالات */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
+                              <span className="i-ph:wifi-bold text-4xl" style={{ color: 'var(--success)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الاتصالات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              التحقق من حالة الاتصال وإدارة إعدادات الاتصال.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">الاتصالات</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة التصحيح */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--warning-light)' }}>
+                              <span className="i-ph:bug-bold text-4xl" style={{ color: 'var(--warning)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              التصحيح
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              التحقق من أخطاء النظام وإدارة أدوات التصحيح.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">التصحيح</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة السجلات */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
+                              <span className="i-ph:file-text-bold text-4xl" style={{ color: 'var(--info)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              السجلات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              مراقبة وتحليل سجلات النظام.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">السجلات</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة التحديثات */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
+                              <span className="i-ph:download-bold text-4xl" style={{ color: 'var(--success)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              التحديثات
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              التحقق من تحديثات التطبيق والمعلومات الأخرى.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">التحديثات</button>
+                              <button className="button w-full">المعلومات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة مدير المهام */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--info-light)' }}>
+                              <span className="i-ph:list-bold text-4xl" style={{ color: 'var(--info)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              مدير المهام
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              التحكم في موارد النظام والعمليات.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">مدير المهام</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة المزودين */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--primary-light)' }}>
+                              <span className="i-ph:cloud-bold text-4xl" style={{ color: 'var(--primary)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              المزودين
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              إدارة المزودين الأماميين والخلفيين.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">المزودين</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
+                          {/* بطاقة الحالة الخدمة */}
+                          <div className="card flex flex-col items-center justify-center text-center">
+                            <div className="icon mb-4" style={{ background: 'var(--success-light)' }}>
+                              <span className="i-ph:server-bold text-4xl" style={{ color: 'var(--success)' }} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
+                              الحالة الخدمة
+                            </h2>
+                            <p className="text-base mb-4" style={{ color: 'var(--text-secondary)' }}>
+                              مراقبة وتحليل حالة الخدمات المستأجرة.
+                            </p>
+                            {/* أزرار أو روابط فرعية */}
+                            <div className="flex flex-col gap-3 w-full mt-2">
+                              <button className="button w-full">الحالة الخدمة</button>
+                              <button className="button w-full">الإعدادات</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
