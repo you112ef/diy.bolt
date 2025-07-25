@@ -655,35 +655,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           disabled={isStreaming}
                         />
                         {chatStarted && <ClientOnly>{() => <ExportChatButton exportChat={exportChat} />}</ClientOnly>}
-                        {/* Agent Mod Button */}
-                        <Tooltip.Root>
-                          <Tooltip.Trigger asChild>
-                            <IconButton
-                              title={isAgentMode ? 'تعطيل وضع Agent' : 'تفعيل وضع Agent'}
-                              className={classNames(
-                                'transition-all flex items-center justify-center',
-                                isAgentMode
-                                  ? 'bg-[#a78bfa]/20 text-[#a78bfa] ring-2 ring-[#a78bfa] shadow'
-                                  : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
-                              )}
-                              onClick={onAgentModeToggle}
-                            >
-                              <div className={classNames(
-                                'i-ph:robot text-lg',
-                                isAgentMode ? 'text-[#a78bfa]' : 'text-bolt-elements-item-contentDefault',
-                              )} />
-                            </IconButton>
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content
-                              className="bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary px-2 py-1 rounded text-sm"
-                              sideOffset={5}
-                            >
-                              {isAgentMode ? 'وضع Agent (مُفعّل)' : 'وضع Agent (متوقف)'}
-                              <Tooltip.Arrow className="fill-bolt-elements-background-depth-3" />
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
                         <IconButton
                           title="Model Settings"
                           className={classNames('transition-all flex items-center gap-1', {
