@@ -577,10 +577,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             <Tooltip.Trigger asChild>
                               <button
                                 className={classNames(
-                                  'absolute flex justify-center items-center top-[18px] right-[60px] p-1 rounded-md w-[34px] h-[34px] transition-all',
+                                  'absolute flex justify-center items-center top-[18px] right-[60px] p-1 rounded-md w-[34px] h-[34px] transition-all duration-300 enhanced-button compact',
                                   isAgentMode
-                                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                                    : 'bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-4 text-bolt-elements-textSecondary'
+                                    ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25'
+                                    : 'bg-enhanced-bg-tertiary hover:bg-enhanced-border-medium text-enhanced-text-secondary border border-enhanced-border-subtle'
                                 )}
                                 onClick={(event) => {
                                   event.preventDefault();
