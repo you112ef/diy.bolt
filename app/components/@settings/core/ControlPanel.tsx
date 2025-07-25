@@ -521,20 +521,20 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                         {visibleTabs.map((tab: TabWithDevType) => (
                           <div
                             key={tab.id}
-                            className="relative bg-[#1c1c22] dark:bg-[#1c1c22] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-md hover:ring-2 ring-[#7c3aed]/40 transition-all duration-200"
+                            className="relative bg-gradient-to-br from-[#232336] to-[#181824] dark:from-[#232336] dark:to-[#181824] text-white rounded-xl p-4 flex flex-col items-center justify-center min-h-[120px] shadow-lg hover:ring-2 ring-[#a78bfa]/50 transition-all duration-200"
                           >
                             {/* Icon */}
-                            <div className="w-6 h-6 mb-2 opacity-80">
+                            <div className="w-6 h-6 mb-2 opacity-90 text-[#a78bfa] dark:text-[#c4b5fd]">
                               {/* Replace with actual icon component if available */}
                               <span className={`i-ph:${tab.id}-fill`} />
                             </div>
-                            <span className="text-sm">{TAB_LABELS[tab.id]}</span>
+                            <span className="text-sm font-semibold text-white/90 dark:text-white/95 drop-shadow-sm">{TAB_LABELS[tab.id]}</span>
                             {/* إشعار أو beta */}
                             {tab.isNew && (
-                              <span className="absolute top-2 right-2 w-2 h-2 bg-[#9f7aea] rounded-full" />
+                              <span className="absolute top-2 right-2 w-2 h-2 bg-[#c084fc] shadow-lg rounded-full" />
                             )}
                             {BETA_TABS.has(tab.id) && (
-                              <span className="absolute top-2 left-2 text-xs text-[#9f7aea] bg-white/5 px-2 py-0.5 rounded-full">BETA</span>
+                              <span className="absolute top-2 left-2 text-xs text-[#f3e8ff] bg-[#a78bfa]/80 px-2 py-0.5 rounded-full shadow">BETA</span>
                             )}
                           </div>
                         ))}
