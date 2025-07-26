@@ -1,6 +1,9 @@
 import React from 'react';
+import { useStore } from '@nanostores/react';
 import BackgroundRays from '~/components/ui/BackgroundRays';
 import { Chat } from '~/components/chat/Chat.client';
+import { sidebarStore, toggleSidebar } from '~/lib/stores/sidebar';
+import { Menu } from '~/components/sidebar/Menu.client';
 
 const techIcons = [
   'logos:astro',
@@ -16,14 +19,27 @@ const techIcons = [
 ];
 
 export default function Index() {
+  const { isOpen: sidebarOpen } = useStore(sidebarStore);
+
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-start bg-gradient-to-br from-[#1a133a] via-[#2d1e5f] to-[#18122b] text-white overflow-x-hidden">
       <BackgroundRays />
+      {/* Sidebar */}
+      <Menu />
       {/* Header */}
       <header className="w-full flex flex-col items-center pt-8 pb-4">
-        <div className="flex items-center gap-2 text-3xl font-bold bg-gradient-to-r from-[#8A5FFF] to-[#6ec1e4] bg-clip-text text-transparent tracking-tight">
-          <span className="i-ph:code-duotone text-2xl" />
-          YOUSEF SH
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleSidebar}
+            className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+            title={sidebarOpen ? 'إغلاق القائمة الجانبية' : 'فتح القائمة الجانبية'}
+          >
+            <span className={`i-ph:${sidebarOpen ? 'x' : 'list'} text-xl`} />
+          </button>
+          <div className="flex items-center gap-2 text-3xl font-bold bg-gradient-to-r from-[#8A5FFF] to-[#6ec1e4] bg-clip-text text-transparent tracking-tight">
+            <span className="i-ph:code-duotone text-2xl" />
+            YOUSEF SH
+          </div>
         </div>
       </header>
       {/* Main Title & Description */}
