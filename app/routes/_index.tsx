@@ -1,31 +1,6 @@
 import React from 'react';
 import BackgroundRays from '~/components/ui/BackgroundRays';
-
-const features = [
-  {
-    icon: '🧠',
-    title: 'Smart AI Assistant',
-    desc: 'Context-aware development with real-time code suggestions',
-  },
-  {
-    icon: '🚀',
-    title: 'Instant Deploy',
-    desc: 'Deploy to Vercel, Netlify, or Cloudflare in one click',
-  },
-  {
-    icon: '💻',
-    title: 'Full IDE Experience',
-    desc: 'Advanced editor with terminal and file management',
-  },
-];
-
-const quickStarts = [
-  'Build a todo app in React using Tailwind',
-  'Build a simple blog using Astro',
-  'Create a cookie consent form using Material UI',
-  'Make a space invaders game',
-  'Make a Tic Tac Toe game in html, css and js only',
-];
+import { Chat } from '~/components/chat/Chat.client';
 
 const techIcons = [
   'logos:astro',
@@ -59,38 +34,21 @@ export default function Index() {
         <p className="text-lg md:text-xl text-center mb-10 text-white/80">
           Build, code, and deploy with the power of AI - from same.new to production
         </p>
-        {/* Features */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-2xl bg-gradient-to-br from-[#2d1e5f]/80 to-[#8A5FFF]/40 shadow-xl p-6 flex flex-col items-center text-center border border-white/10 hover:scale-105 transition-transform"
-            >
-              <div className="text-4xl mb-3">{f.icon}</div>
-              <div className="font-bold text-lg mb-1 text-white">{f.title}</div>
-              <div className="text-white/80 text-sm">{f.desc}</div>
-            </div>
-          ))}
-        </div>
-        {/* Quick Start Buttons */}
-        <div className="w-full flex flex-col items-center mb-8">
-          {quickStarts.map((q, i) => (
-            <button
-              key={q}
-              className="w-full md:w-auto mb-3 px-6 py-2 rounded-full bg-gradient-to-r from-[#8A5FFF] to-[#6ec1e4] text-white font-semibold shadow hover:from-[#a78bfa] hover:to-[#8A5FFF] transition-all"
-            >
-              {q}
-            </button>
-          ))}
-          <div className="mt-2 text-white/60">or start a blank app with your favorite stack</div>
+      </main>
+      {/* Chat Box Section */}
+      <section className="w-full flex flex-col items-center justify-center flex-1">
+        <div className="relative w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 p-0 md:p-2 flex flex-col items-center justify-center z-10">
+          <div className="w-full p-0 md:p-6">
+            <Chat />
+          </div>
         </div>
         {/* Tech Icons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8 opacity-80">
+        <div className="flex flex-wrap justify-center gap-4 mt-10 mb-8 opacity-80">
           {techIcons.map((icon) => (
             <span key={icon} className={`iconify text-3xl`} data-icon={icon}></span>
           ))}
         </div>
-      </main>
+      </section>
     </div>
   );
 }
