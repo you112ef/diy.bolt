@@ -14,6 +14,7 @@ import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
+import { sidebarStore, closeSidebar } from '~/lib/stores/sidebar';
 
 const menuVariants = {
   closed: {
@@ -67,7 +68,7 @@ export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
-  const [open, setOpen] = useState(false);
+  const { isOpen: open } = useStore(sidebarStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const profile = useStore(profileStore);
@@ -288,11 +289,12 @@ export const Menu = () => {
       }
 
       if (event.pageX < enterThreshold) {
-        setOpen(true);
+        // Don't auto-open on mouse move, let the button control it
+        return;
       }
 
       if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
-        setOpen(false);
+        closeSidebar();
       }
     }
 
@@ -310,7 +312,7 @@ export const Menu = () => {
 
   const handleSettingsClick = () => {
     setIsSettingsOpen(true);
-    setOpen(false);
+    closeSidebar();
   };
 
   const handleSettingsClose = () => {

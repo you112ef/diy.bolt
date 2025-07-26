@@ -1,28 +1,70 @@
-import { json, type MetaFunction } from '@remix-run/cloudflare';
-import { ClientOnly } from 'remix-utils/client-only';
-import { BaseChat } from '~/components/chat/BaseChat';
-import { Chat } from '~/components/chat/Chat.client';
-import { Header } from '~/components/header/Header';
+import React from 'react';
+import { useStore } from '@nanostores/react';
 import BackgroundRays from '~/components/ui/BackgroundRays';
+import { Chat } from '~/components/chat/Chat.client';
+import { sidebarStore, toggleSidebar } from '~/lib/stores/sidebar';
+import { Menu } from '~/components/sidebar/Menu.client';
 
-export const meta: MetaFunction = () => {
-  return [{ title: 'Bolt' }, { name: 'description', content: 'Talk with Bolt, an AI assistant from StackBlitz' }];
-};
+const techIcons = [
+  'logos:astro',
+  'logos:nextjs-icon',
+  'logos:react',
+  'logos:svelte-icon',
+  'logos:solidjs-icon',
+  'logos:vue',
+  'logos:typescript-icon',
+  'logos:vercel-icon',
+  'logos:netlify-icon',
+  'logos:cloudflare-icon',
+];
 
-export const loader = () => json({});
-
-/**
- * Landing page component for Bolt
- * Note: Settings functionality should ONLY be accessed through the sidebar menu.
- * Do not add settings button/panel to this landing page as it was intentionally removed
- * to keep the UI clean and consistent with the design system.
- */
 export default function Index() {
+  const { isOpen: sidebarOpen } = useStore(sidebarStore);
+
   return (
-    <div className="flex flex-col h-full w-full bg-bolt-elements-background-depth-1">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-start bg-gradient-to-br from-[#1a133a] via-[#2d1e5f] to-[#18122b] text-white overflow-x-hidden">
       <BackgroundRays />
-      <Header />
-      <ClientOnly fallback={<BaseChat />}>{() => <Chat />}</ClientOnly>
+      {/* Sidebar */}
+      <Menu />
+      {/* Header */}
+      <header className="w-full flex flex-col items-center pt-8 pb-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleSidebar}
+            className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+            title={sidebarOpen ? 'إغلاق القائمة الجانبية' : 'فتح القائمة الجانبية'}
+          >
+            <span className={`i-ph:${sidebarOpen ? 'x' : 'list'} text-xl`} />
+          </button>
+          <div className="flex items-center gap-2 text-3xl font-bold bg-gradient-to-r from-[#8A5FFF] to-[#6ec1e4] bg-clip-text text-transparent tracking-tight">
+            <span className="i-ph:code-duotone text-2xl" />
+            YOUSEF SH
+          </div>
+        </div>
+      </header>
+      {/* Main Title & Description */}
+      <main className="flex flex-col items-center w-full max-w-2xl px-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-4 mt-4 bg-gradient-to-r from-[#fff] via-[#a78bfa] to-[#6ec1e4] bg-clip-text text-transparent drop-shadow-lg">
+          Where Ideas Begin
+        </h1>
+        <p className="text-lg md:text-xl text-center mb-10 text-white/80">
+          Build, code, and deploy with the power of AI - from same.new to production
+        </p>
+      </main>
+      {/* Chat Box Section */}
+      <section className="w-full flex flex-col items-center justify-center flex-1">
+        <div className="relative w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl border border-white/10 p-0 md:p-2 flex flex-col items-center justify-center z-10">
+          <div className="w-full p-0 md:p-6">
+            <Chat />
+          </div>
+        </div>
+        {/* Tech Icons */}
+        <div className="flex flex-wrap justify-center gap-4 mt-10 mb-8 opacity-80">
+          {techIcons.map((icon) => (
+            <span key={icon} className={`iconify text-3xl`} data-icon={icon}></span>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
