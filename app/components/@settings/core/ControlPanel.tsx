@@ -455,106 +455,69 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
     setTimeout(() => setLoadingTab(null), 500);
   };
 
+  // بطاقات لوحة التحكم حسب التصميم
+  const controlCards = [
+    {
+      key: 'features',
+      label: 'Features',
+      icon: 'i-ph:star-duotone',
+      color: 'from-[#8A5FFF]/80 to-[#2d1e5f]/60',
+    },
+    {
+      key: 'data',
+      label: 'Data Management',
+      icon: 'i-ph:database-duotone',
+      color: 'from-[#6ec1e4]/80 to-[#1a133a]/60',
+    },
+    {
+      key: 'cloud',
+      label: 'Cloud Providers',
+      icon: 'i-ph:cloud-duotone',
+      color: 'from-[#a78bfa]/80 to-[#8A5FFF]/40',
+    },
+    {
+      key: 'local',
+      label: 'Local Providers',
+      icon: 'i-ph:monitor-duotone',
+      color: 'from-[#2d1e5f]/80 to-[#18122b]/60',
+      beta: true,
+    },
+    {
+      key: 'connection',
+      label: 'Connection',
+      icon: 'i-ph:wifi-high-duotone',
+      color: 'from-[#8A5FFF]/60 to-[#6ec1e4]/40',
+    },
+    {
+      key: 'notifications',
+      label: 'Notifications',
+      icon: 'i-ph:bell-duotone',
+      color: 'from-[#6ec1e4]/60 to-[#a78bfa]/40',
+    },
+    {
+      key: 'eventlogs',
+      label: 'Event Logs',
+      icon: 'i-ph:list-duotone',
+      color: 'from-[#18122b]/80 to-[#2d1e5f]/60',
+    },
+  ];
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg-main)] py-16">
-      <div className="w-full max-w-lg card flex flex-col items-center justify-center text-center shadow-lg p-10">
-        <div
-          className="icon mb-8"
-          style={{ background: 'var(--primary-light)', width: '5rem', height: '5rem', fontSize: '2.5rem' }}
-        >
-          <span className="i-ph:gear-six-bold text-5xl" style={{ color: 'var(--primary)' }} />
-        </div>
-        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-          الإعدادات
-        </h1>
-        <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
-          تحكم كامل في جميع خيارات وميزات التطبيق من مكان واحد.
-        </p>
-        <div className="flex flex-col gap-5 w-full">
-          <button
-            className="button w-full flex items-center justify-center gap-2 text-lg"
-            onClick={() => setShowExtensions(true)}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1a133a] via-[#2d1e5f] to-[#18122b] py-16">
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {controlCards.map((card) => (
+          <div
+            key={card.key}
+            className={`relative rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-xl bg-gradient-to-br ${card.color} border border-white/10 hover:scale-105 transition-transform`}
           >
-            <span className="i-ph:puzzle-piece-bold text-xl" /> الملحقات
-          </button>
-          <button
-            className="button w-full flex items-center justify-center gap-2 text-lg"
-            onClick={() => setShowTheme(true)}
-          >
-            <span className="i-ph:paint-brush-broad-bold text-xl" /> المظهر
-          </button>
-          <button
-            className="button w-full flex items-center justify-center gap-2 text-lg"
-            onClick={() => setShowModels(true)}
-          >
-            <span className="i-ph:cpu-bold text-xl" /> النماذج
-          </button>
-        </div>
+            <span className={`text-4xl mb-4 ${card.icon}`} />
+            <span className="font-bold text-lg text-white mb-1">{card.label}</span>
+            {card.beta && (
+              <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-purple-500/20 text-xs text-purple-300 font-bold">BETA</span>
+            )}
+          </div>
+        ))}
       </div>
-      {/* نافذة الملحقات */}
-      {showExtensions && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col relative">
-            <button
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
-              onClick={() => setShowExtensions(false)}
-            >
-              <span className="i-ph:x text-xl" />
-            </button>
-            <div className="flex items-center gap-2 p-6 border-b border-[#ececec]">
-              <span className="i-ph:puzzle-piece-bold text-2xl text-[#8A5FFF]" />
-              <span className="text-lg font-bold text-black">إدارة ملحقات VSCode</span>
-            </div>
-            <div className="flex-1 overflow-hidden flex items-center justify-center">
-              <iframe src="http://localhost:3001" title="VSCode Web" className="w-full h-full border-0 rounded-b-2xl" />
-            </div>
-          </div>
-        </div>
-      )}
-      {/* نافذة المظهر */}
-      {showTheme && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
-            <button
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
-              onClick={() => setShowTheme(false)}
-            >
-              <span className="i-ph:x text-xl" />
-            </button>
-            <span className="i-ph:paint-brush-broad-bold text-3xl text-[#8A5FFF] mb-4" />
-            <h2 className="text-xl font-bold mb-2">تغيير المظهر</h2>
-            <p className="text-base mb-4 text-gray-600">اختر الوضع الليلي أو النهاري أو لون مخصص.</p>
-            {/* خيارات المظهر (ليلي/نهاري/مخصص) */}
-            <div className="flex gap-4">
-              <button className="button">ليلي</button>
-              <button className="button">نهاري</button>
-              <button className="button">مخصص</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* نافذة النماذج */}
-      {showModels && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#fff] rounded-2xl shadow-2xl w-full max-w-md h-[60vh] flex flex-col relative p-8 items-center justify-center">
-            <button
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-black"
-              onClick={() => setShowModels(false)}
-            >
-              <span className="i-ph:x text-xl" />
-            </button>
-            <span className="i-ph:cpu-bold text-3xl text-[#8A5FFF] mb-4" />
-            <h2 className="text-xl font-bold mb-2">إدارة النماذج</h2>
-            <p className="text-base mb-4 text-gray-600">إضافة أو إزالة أو تخصيص نماذج الذكاء الاصطناعي.</p>
-            {/* قائمة النماذج أو خيارات الإدارة */}
-            <div className="flex flex-col gap-2 w-full">
-              <button className="button w-full">إضافة نموذج جديد</button>
-              <button className="button w-full">إزالة نموذج</button>
-              <button className="button w-full">تخصيص</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
